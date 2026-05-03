@@ -60,12 +60,88 @@
 
 
 
-// App.jsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // App.jsx
+// import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+// import { SidebarProvider } from "./contexts/SidebarContext";
+// import Layout from "./components/Layout";
+
+// // Sahifalar
+// import Dashboard from "./pages/Dashboard";
+// import Teachers from "./pages/Teachers";
+// import Classes from "./pages/Classes";
+// import Students from "./pages/Students";
+// import Courses from "./pages/settings/Courses";
+// import Rooms from "./pages/settings/Rooms";
+// import Staff from "./pages/settings/Staff";
+// import Messages from "./pages/settings/Messages";
+
+// function App() {
+//   return (
+//     <SidebarProvider>
+//       <BrowserRouter>
+//         <Layout>
+//           <Routes>
+//                     {/* Root yo'nalish — dashboard'ga yo'naltirish */}
+//             <Route path="/" element={<Navigate to="/login" replace />} />
+//             <Route path="/dashboard" element={<Dashboard />} />
+//             <Route path="/teachers" element={<Teachers />} />
+//             <Route path="/classes" element={<Classes />} />
+//             <Route path="/students" element={<Students />} />
+//             <Route path="/settings/courses" element={<Courses />} />
+//             <Route path="/settings/rooms" element={<Rooms />} />
+//             <Route path="/settings/staff" element={<Staff />} />
+//             <Route path="/settings/messages" element={<Messages />} />
+//             <Route path="/" element={<Dashboard />} />
+//           </Routes>
+//         </Layout>
+//       </BrowserRouter>
+//     </SidebarProvider>
+//   );
+// }
+
+// export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// src/App.jsx
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "./contexts/SidebarContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Sahifalar
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Teachers from "./pages/Teachers";
 import Classes from "./pages/Classes";
@@ -75,27 +151,47 @@ import Rooms from "./pages/settings/Rooms";
 import Staff from "./pages/settings/Staff";
 import Messages from "./pages/settings/Messages";
 
+// Root yo'naltirish — auth holatiga qarab
+function RootRedirect() {
+  const { isAuthenticated } = useAuth();
+  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
+}
+
 function App() {
   return (
-    <SidebarProvider>
+    <AuthProvider>
       <BrowserRouter>
-        <Layout>
-          <Routes>
-                    {/* Root yo'nalish — dashboard'ga yo'naltirish */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/teachers" element={<Teachers />} />
-            <Route path="/classes" element={<Classes />} />
-            <Route path="/students" element={<Students />} />
-            <Route path="/settings/courses" element={<Courses />} />
-            <Route path="/settings/rooms" element={<Rooms />} />
-            <Route path="/settings/staff" element={<Staff />} />
-            <Route path="/settings/messages" element={<Messages />} />
-            <Route path="/" element={<Dashboard />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          {/* Login — Layout'siz, ochiq */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Himoyalangan sahifalar — Layout bilan */}
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <SidebarProvider>
+                  <Layout>
+                    <Routes>
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/teachers" element={<Teachers />} />
+                      <Route path="/classes" element={<Classes />} />
+                      <Route path="/students" element={<Students />} />
+                      <Route path="/settings/courses" element={<Courses />} />
+                      <Route path="/settings/rooms" element={<Rooms />} />
+                      <Route path="/settings/staff" element={<Staff />} />
+                      <Route path="/settings/messages" element={<Messages />} />
+                      <Route path="/" element={<RootRedirect />} />
+                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                    </Routes>
+                  </Layout>
+                </SidebarProvider>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
       </BrowserRouter>
-    </SidebarProvider>
+    </AuthProvider>
   );
 }
 
