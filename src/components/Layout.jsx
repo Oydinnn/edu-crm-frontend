@@ -1,0 +1,57 @@
+// // components/Layout.jsx
+// import { useSidebar } from "../contexts/SidebarContext";
+// import Sidebar from "./Sidebar";
+// import Navbar from "./Navbar";
+
+// export default function Layout({ children }) {
+//   const { isCollapsed } = useSidebar();
+
+//   return (
+//     <div className="min-h-screen bg-gray-50/50">
+//       <Sidebar />
+//       <Navbar />
+      
+//       {/* Asosiy content - margin-left sidebar kengligiga qarab o'zgaradi */}
+//       <main
+//         className={`transition-all duration-300 pt-16 min-h-screen ${
+//           isCollapsed ? "ml-20" : "ml-64"
+//         }`}
+//       >
+//         <div className="p-6">
+//           {children}
+//         </div>
+//       </main>
+//     </div>
+//   );
+// }
+
+
+
+
+import { useSidebar } from "../contexts/SidebarContext";
+import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
+
+export default function Layout({ children }) {
+  const { isCollapsed } = useSidebar();
+
+  return (
+    <div className="min-h-screen bg-gray-50/50">
+      {/* Sidebar fixed - alohida */}
+      <Sidebar />
+      
+      {/* Asosiy maydon - Sidebar o'ng tomonida */}
+      <div
+        className={`flex flex-col min-h-screen transition-all duration-300 ${
+          isCollapsed ? "ml-20" : "ml-64"
+        }`}
+      >
+        <Navbar />
+        
+        <main className="flex-1 p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}

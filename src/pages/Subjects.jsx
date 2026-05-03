@@ -5,8 +5,6 @@ import SubjectsPage from "../components/SubjectsPage";
 export default function Subjects() {
   return (
     <div>
-      <Sidebar />
-      <Navbar />
       <SubjectsPage />
     </div>
   );

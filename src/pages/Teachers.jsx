@@ -5,8 +5,6 @@ import TeachersPage from "../components/TeachersPage";
 export default function Dashboard() {
   return (
     <div>
-      <Sidebar />
-      <Navbar />
       <TeachersPage />
     </div>
   );

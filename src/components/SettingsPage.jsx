@@ -15,7 +15,8 @@ const settingsMenuItems = [
   { icon: "✅", label: "Tekshiruv", path: "/settings/check" },
 ];
 
-export default function SettingsMenu() {  // Nomi o'zgartirildi
+export default function SettingsPage() {
+  // Nomi o'zgartirildi
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -35,8 +36,8 @@ export default function SettingsMenu() {  // Nomi o'zgartirildi
         onClick={() => setOpen((prev) => !prev)}
         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
           open
-            ? "text-orange-500 bg-orange-50"
-            : "text-gray-600 hover:bg-gray-100"
+            ? "text-white bg-[#1f39a1] shadow-md"
+            : "text-[#4a5568] hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
         }`}
       >
         <span className="text-xl">⚙️</span>
@@ -56,7 +57,7 @@ export default function SettingsMenu() {  // Nomi o'zgartirildi
             <span className="font-semibold text-sm text-gray-800">Menu</span>
             <button
               onClick={() => setOpen(false)}
-              className="bg-orange-500 hover:bg-orange-600 text-white rounded-md w-6 h-6 text-xs flex items-center justify-center transition"
+              className="bg-[#1f39a1] hover:bg-[#162870] text-white rounded-md w-6 h-6 text-xs flex items-center justify-center transition shadow-md"
             >
               ✕
             </button>
@@ -70,8 +71,8 @@ export default function SettingsMenu() {  // Nomi o'zgartirildi
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-2.5 text-sm transition ${
                   isActive
-                    ? "text-orange-500 bg-orange-50"
-                    : "text-gray-600 hover:bg-orange-50 hover:text-orange-500"
+                    ? "text-white bg-[#1f39a1] shadow-md"
+                    : "text-[#4a5568] hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
                 }`
               }
             >
