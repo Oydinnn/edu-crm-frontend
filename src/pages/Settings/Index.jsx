@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 
+
 const tabs = [
   { name: "Kurslar",        path: "/settings/courses"  },
   { name: "Xonalar",        path: "/settings/rooms"    },

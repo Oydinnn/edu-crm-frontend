@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";  // ✅ AuthContext'dan import
 import StudyImg from "../assets/imgs/study.svg";
-import Logo from "../assets/imgs/newlogotype.png";
+import Logo from "../assets/imgs/logo.png";
 import axios from 'axios';
 
 export default function LoginPage() {
