@@ -111,7 +111,8 @@ export default function TeachersPage() {
                 <div className="w-11 h-11 rounded-full overflow-hidden bg-[#1f39a1] flex items-center justify-center text-white font-semibold">
                   {t.photo ? (
                     <img
-                      src={`http://localhost:3000${t.photo}`}
+                      src={`${import.meta.env.VITE_API_URL?.replace('/api/v1', '')}${t.photo}`}
+                      // src={`http://localhost:3000${t.photo}`}
                       alt={t.first_name}
                       className="w-full h-full object-cover"
                     />

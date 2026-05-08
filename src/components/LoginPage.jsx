@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";  // ✅ AuthContext'dan import
 import StudyImg from "../assets/imgs/study.svg";
 import Logo from "../assets/imgs/logo.png";
-import axios from 'axios';
+import api from "../services/axios";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/auth/login", {
+      const response = await api.post("/auth/login", {
         phone: formData.phone,
         password: formData.password,
       });
