@@ -6,10 +6,13 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   optimizeDeps: {
-    // MUI ikonkalari skanerlashda muammo tug'dirmasligi uchun ularni "include" qiling
     include: ['@mui/icons-material'],
   },
   base: '/',
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+  },
   server: {
     proxy: {
       '/api': {
