@@ -36,7 +36,7 @@ export default function Layout({ children }) {
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 transition-colors duration-300">
       {/* Sidebar fixed - alohida */}
       <Sidebar />
       

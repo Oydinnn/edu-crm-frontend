@@ -12,7 +12,7 @@ export default function Index() {
   return (
     <div>
       {/* Sarlavha */}
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4">Boshqarish</h1>
+      <h1 className="text-2xl font-semibold text-gray-800 mb-4 dark:text-blue-400">Boshqarish</h1>
 
       {/* Tablar */}
       <div className="flex gap-1 flex-wrap border-b border-gray-200 mb-6">

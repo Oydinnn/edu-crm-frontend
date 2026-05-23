@@ -1,3 +1,641 @@
+// // showicon ishlagani faqat table widthi kichraydi
+
+// import { useState, useEffect } from "react";
+// import {
+//   Drawer,
+//   Box,
+//   Typography,
+//   IconButton,
+//   Avatar,
+//   Stack,
+//   Divider,
+//   Chip,
+//   Button,
+//   CircularProgress,
+//   Skeleton,
+// } from "@mui/material";
+// import {
+//   Close,
+//   Edit,
+//   Phone,
+//   Email,
+//   Cake,
+//   LocationOn,
+//   CalendarToday,
+//   Person,
+// } from "@mui/icons-material";
+// import api from "../../services/axios";
+
+// function getPhotoUrl(photo) {
+//   if (!photo) return null;
+//   if (photo.startsWith("http")) return photo;
+//   const base =
+//     import.meta.env.VITE_API_URL?.replace("/api/v1", "") ||
+//     "http://localhost:3000";
+//   return `${base}/uploads/${photo}`;
+// }
+
+// const AVATAR_COLORS = [
+//   { bg: "#ede9fe", color: "#5b21b6" },
+//   { bg: "#ecfdf5", color: "#065f46" },
+//   { bg: "#fef3c7", color: "#92400e" },
+//   { bg: "#fee2e2", color: "#991b1b" },
+//   { bg: "#e0f2fe", color: "#0c4a6e" },
+// ];
+
+// function getInitials(name = "") {
+//   return name
+//     .split(" ")
+//     .map((w) => w[0])
+//     .join("")
+//     .slice(0, 2)
+//     .toUpperCase();
+// }
+
+// function formatDate(iso) {
+//   if (!iso) return "—";
+//   return new Date(iso).toLocaleDateString("uz-UZ", {
+//     day: "2-digit",
+//     month: "2-digit",
+//     year: "numeric",
+//   });
+// }
+
+// // ─── Info Row ────────────────────────────────────────────────────────────────
+// function InfoRow({ icon, label, value }) {
+//   return (
+//     <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.5, py: 1.2 }}>
+//       <Box
+//         sx={{
+//           width: 32,
+//           height: 32,
+//           borderRadius: 1.5,
+//           bgcolor: "#f3f4f6",
+//           display: "flex",
+//           alignItems: "center",
+//           justifyContent: "center",
+//           flexShrink: 0,
+//         }}
+//       >
+//         {icon}
+//       </Box>
+//       <Box>
+//         <Typography
+//           fontSize={11}
+//           color="text.secondary"
+//           fontWeight={500}
+//           mb={0.2}
+//         >
+//           {label}
+//         </Typography>
+//         <Typography fontSize={13} fontWeight={500} color="#111827">
+//           {value || "—"}
+//         </Typography>
+//       </Box>
+//     </Box>
+//   );
+// }
+
+// // ─── Modal ────────────────────────────────────────────────────────────────────
+// export default function StudentShowModal({ student, onClose, onEdit }) {
+//   const [detail, setDetail] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   console.log(student, onClose, onEdit);
+
+//   useEffect(() => {
+//     if (!student?.id) return;
+//     setDetail(null);
+//     setLoading(true);
+//     api
+//       .get(`/students/${student.id}`)
+//       .then((res) => {
+//         const d = res.data.data;
+//         // created_at detail da yo'q, listdagini olish
+//         setDetail({ ...d, created_at: d.created_at || student.created_at });
+//       })
+//       .catch(() => setDetail(student))
+//       .finally(() => setLoading(false));
+//   }, [student?.id]);
+
+//   const data = detail || student;
+//   const av = data
+//     ? AVATAR_COLORS[data.id % AVATAR_COLORS.length]
+//     : AVATAR_COLORS[0];
+
+//   return (
+//     <Drawer
+//       anchor="right"
+//       open={!!student}
+//       onClose={onClose}
+//       PaperProps={{
+//         sx: {
+//           width: { xs: "100%", sm: 420 },
+//           display: "flex",
+//           flexDirection: "column",
+//         },
+//       }}
+//     >
+//       {/* ── Header ── */}
+//       <Box
+//         sx={{
+//           px: 3,
+//           py: 2.5,
+//           borderBottom: "1px solid #e5e7eb",
+//           display: "flex",
+//           justifyContent: "space-between",
+//           alignItems: "center",
+//         }}
+//       >
+//         <Typography fontWeight={600} fontSize={16}>
+//           Talaba ma'lumotlari
+//         </Typography>
+//         <IconButton size="small" onClick={onClose}>
+//           <Close fontSize="small" />
+//         </IconButton>
+//       </Box>
+
+//       {/* ── Body ── */}
+//       <Box sx={{ flex: 1, overflowY: "auto", px: 3, py: 3 }}>
+//         {loading ? (
+//           <Stack spacing={2}>
+//             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+//               <Skeleton variant="circular" width={64} height={64} />
+//               <Box sx={{ flex: 1 }}>
+//                 <Skeleton width="60%" height={22} />
+//                 <Skeleton width="40%" height={18} />
+//               </Box>
+//             </Box>
+//             {[1, 2, 3, 4, 5].map((i) => (
+//               <Skeleton key={i} height={48} sx={{ borderRadius: 2 }} />
+//             ))}
+//           </Stack>
+//         ) : data ? (
+//           <>
+//             {/* Avatar + ism */}
+//             <Box
+//               sx={{
+//                 display: "flex",
+//                 alignItems: "center",
+//                 gap: 2,
+//                 bgcolor: "#f9fafb",
+//                 borderRadius: 3,
+//                 p: 2,
+//                 mb: 3,
+//               }}
+//             >
+//               {data.photo ? (
+//                 <Avatar
+//                   src={getPhotoUrl(data.photo)}
+//                   sx={{ width: 64, height: 64 }}
+//                 />
+//               ) : (
+//                 <Avatar
+//                   sx={{
+//                     width: 64,
+//                     height: 64,
+//                     bgcolor: av.bg,
+//                     color: av.color,
+//                     fontSize: 22,
+//                     fontWeight: 700,
+//                   }}
+//                 >
+//                   {getInitials(data.full_name)}
+//                 </Avatar>
+//               )}
+//               <Box>
+//                 <Typography fontWeight={700} fontSize={16}>
+//                   {data.full_name || "—"}
+//                 </Typography>
+//                 <Chip
+//                   label={data.status || "active"}
+//                   size="small"
+//                   sx={{
+//                     mt: 0.5,
+//                     fontSize: 11,
+//                     height: 20,
+//                     bgcolor: "#dcfce7",
+//                     color: "#166534",
+//                     fontWeight: 600,
+//                   }}
+//                 />
+//               </Box>
+//             </Box>
+
+//             <Divider sx={{ mb: 2 }} />
+
+//             {/* Ma'lumotlar */}
+//             <Stack divider={<Divider flexItem />}>
+//               <InfoRow
+//                 icon={<Phone sx={{ fontSize: 15, color: "#6b7280" }} />}
+//                 label="Telefon raqam"
+//                 value={data.phone}
+//               />
+//               <InfoRow
+//                 icon={<Email sx={{ fontSize: 15, color: "#6b7280" }} />}
+//                 label="Email"
+//                 value={data.email}
+//               />
+//               <InfoRow
+//                 icon={<LocationOn sx={{ fontSize: 15, color: "#6b7280" }} />}
+//                 label="Manzil"
+//                 value={data.address}
+//               />
+//               <InfoRow
+//                 icon={<Cake sx={{ fontSize: 15, color: "#6b7280" }} />}
+//                 label="Tug'ilgan sana"
+//                 value={formatDate(data.birth_date)}
+//               />
+//               <InfoRow
+//                 icon={<CalendarToday sx={{ fontSize: 15, color: "#6b7280" }} />}
+//                 label="Ro'yxatga olingan"
+//                 value={formatDate(data.created_at)}
+//               />
+//             </Stack>
+
+           
+
+//             {data.groups?.length > 0 && (
+//               <Box sx={{ mt: 3 }}>
+//                 <Typography
+//                   fontSize={12}
+//                   fontWeight={600}
+//                   color="text.secondary"
+//                   mb={1}
+//                 >
+//                   GURUHLAR
+//                 </Typography>
+//                 <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.8}>
+//                   {data.groups.map((g, i) => (
+//                     <Chip 
+//                     key={g.id || i} 
+//                     label={g.name || `Guruh ${i + 1}`} 
+//                     size="small"
+//                       sx={{
+//                         bgcolor: "#ede9fe",
+//                         color: "#5b21b6",
+//                         fontSize: 12,
+//                         fontWeight: 500,
+//                       }}
+//                     />
+//                   ))}
+//                 </Stack>
+//               </Box>
+//             )}
+//           </>
+//         ) : null}
+//       </Box>
+
+//       {/* ── Footer ── */}
+//       <Box
+//         sx={{
+//           px: 3,
+//           py: 2,
+//           borderTop: "1px solid #e5e7eb",
+//           display: "flex",
+//           gap: 1.5,
+//           bgcolor: "#fafafa",
+//         }}
+//       >
+//         <Button
+//           fullWidth
+//           variant="outlined"
+//           onClick={onClose}
+//           sx={{
+//             textTransform: "none",
+//             borderRadius: 2,
+//             borderColor: "#d1d5db",
+//             color: "#374151",
+//           }}
+//         >
+//           Yopish
+//         </Button>
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           startIcon={<Edit fontSize="small" />}
+//           onClick={() => onEdit(data)}
+//           disabled={loading || !data}
+//           sx={{
+//             textTransform: "none",
+//             borderRadius: 2,
+//             bgcolor: "#1f39a1",
+//             "&:hover": { bgcolor: "#162d80" },
+//           }}
+//         >
+//           Tahrirlash
+//         </Button>
+//       </Box>
+//     </Drawer>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // boshqarish dropdown ishladi, belgilanganda bitta-bitta belgilanyapti 14.05.2026
+
+
+// import { NavLink, useLocation, useNavigate } from "react-router-dom";
+// import { useRef, useEffect } from "react";
+// import Logo from "../assets/imgs/logo.png";
+
+// // MUI Icons import
+// import HomeIcon from "@mui/icons-material/Home";
+// import SchoolIcon from "@mui/icons-material/School";
+// import GroupIcon from "@mui/icons-material/Group";
+// import PersonIcon from "@mui/icons-material/Person";
+// import SettingsIcon from "@mui/icons-material/Settings";
+// import BookIcon from "@mui/icons-material/Book";
+// import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+// import PeopleIcon from "@mui/icons-material/People";
+// import EmailIcon from "@mui/icons-material/Email";
+// import WarningIcon from "@mui/icons-material/Warning";
+// import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+// import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+// import { useSidebar } from "../contexts/SidebarContext";
+
+// export default function Sidebar() {
+//   const location = useLocation();
+//   const navigate = useNavigate();
+//   const { isCollapsed, setIsCollapsed, isSettingsOpen, setIsSettingsOpen } =
+//     useSidebar();
+
+//   const dropdownRef = useRef(null);
+//   const prevSettingsActive = useRef(false);
+
+//   const menuItems = [
+//     { id: "dashboard", name: "Asosiy", icon: HomeIcon, path: "/dashboard" },
+//     {
+//       id: "teachers",
+//       name: "O'qituvchilar",
+//       icon: SchoolIcon,
+//       path: "/teachers",
+//     },
+//     { id: "groups", name: "Guruhlar", icon: GroupIcon, path: "/groups" },
+//     { id: "students", name: "Talabalar", icon: PersonIcon, path: "/students" },
+//   ];
+
+//   const settingsItems = [
+//     {
+//       id: "courses",
+//       name: "Kurslar",
+//       icon: BookIcon,
+//       path: "/settings/courses",
+//     },
+//     {
+//       id: "rooms",
+//       name: "Xonalar",
+//       icon: MeetingRoomIcon,
+//       path: "/settings/rooms",
+//     },
+//     {
+//       id: "staff",
+//       name: "Hodimlar",
+//       icon: PeopleIcon,
+//       path: "/settings/staff",
+//     },
+//     {
+//       id: "messages",
+//       name: "Xabar Yuborish",
+//       icon: EmailIcon,
+//       path: "/settings/messages",
+//     },
+//   ];
+
+//   const isSettingsActive = location.pathname.startsWith("/settings");
+  
+
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//         setIsSettingsOpen(false);
+//       }
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, [setIsSettingsOpen]);
+
+//   const toggleSidebar = () => {
+//     setIsCollapsed(!isCollapsed);
+//     if (!isCollapsed) setIsSettingsOpen(false);
+//   };
+
+//   const handleBoshqarishClick = (e) => {
+//     e.preventDefault();
+
+//     // 1. Sidebar yopiq bo'lsa, ochamiz
+//     if (isCollapsed) setIsCollapsed(false);
+
+//     // 2. Dropdown holatini o'zgartiramiz (ochish/yopish)
+//     setIsSettingsOpen(!isSettingsOpen);
+
+    
+//   };
+
+//   return (
+//     <div className="flex bg-gray-50/50">
+//       <aside
+//         className={`bg-white shadow-lg fixed h-screen top-0 left-0 flex flex-col justify-between transition-all duration-300 z-50 ${isCollapsed ? "w-20" : "w-64"}`}
+//       >
+//         <div
+//           className={`${isCollapsed ? "p-3" : "p-6"} flex-1 overflow-y-auto no-scrollbar`}
+//         >
+//           <div
+//             className={`flex items-center mb-8 ${isCollapsed ? "flex-col gap-3" : "justify-between"}`}
+//           >
+//             <NavLink
+//               to="/dashboard"
+//               onClick={() => setIsSettingsOpen(false)}
+//               className="flex items-center gap-2 p-2"
+//             >
+//               <img src={Logo} className="w-8 h-8" alt="Logo" />
+//               {!isCollapsed && (
+//                 <h1 className="text-xl font-bold text-[#4a5568]">EduCRM</h1>
+//               )}
+//             </NavLink>
+//             <button
+//               onClick={toggleSidebar}
+//               className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1f39a1] text-white"
+//             >
+//               {isCollapsed ? (
+//                 <ChevronRightIcon className="w-5 h-5" />
+//               ) : (
+//                 <ChevronLeftIcon className="w-5 h-5" />
+//               )}
+//             </button>
+//           </div>
+
+//           <nav>
+//             <ul className="space-y-2">
+//               {/* Asosiy menyu elementlari */}
+//               {menuItems.map((item) => {
+//                 const Icon = item.icon;
+//                 const isActive =
+//   (item.path === "/dashboard" &&
+//     (location.pathname === "/dashboard" || location.pathname === "/")) ||
+//   location.pathname === item.path;
+
+//                 return (
+//                   <li key={item.id}>
+//                     <NavLink
+//                       to={item.path}
+//                       onClick={() => setIsSettingsOpen(false)}
+//                       className={`w-full flex items-center rounded-lg transition-all duration-300 outline-none 
+//                       ${isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3"}
+//                      ${isActive && !isSettingsOpen
+//                         ? "bg-[#1f39a1] text-white shadow-md"
+//                         : "text-[#4a5568] hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
+//                       }`}
+//                     >
+//                       <Icon className="w-5 h-5" />
+//                       {!isCollapsed && <span>{item.name}</span>}
+//                     </NavLink>
+//                   </li>
+//                 );
+//               })}
+
+//               {/* Boshqarish tugmasi va Dropdown */}
+//               <li ref={dropdownRef} className="relative">
+//                 <button
+//                   onClick={handleBoshqarishClick}
+//                   className={`w-full flex items-center rounded-lg transition-all duration-500 outline-none ${isCollapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3"} 
+//                   ${isSettingsActive || isSettingsOpen  ? "bg-[#1f39a1] text-white shadow-md" : "text-[#4a5568] hover:bg-[#f0f4ff] hover:text-[#1f39a1]"}`}
+//                 >
+//                   <SettingsIcon
+//                     className={`w-5 h-5 transition-transform ${isSettingsOpen && !isCollapsed ? "rotate-90" : ""}`}
+//                   />
+//                   {!isCollapsed && (
+//                     <span className="flex-1 text-left">Boshqarish</span>
+//                   )}
+//                   {!isCollapsed && (
+//                     <span
+//                       className={`text-[10px] transition-transform ${isSettingsOpen ? "" : "rotate-90"}`}
+//                     >
+//                       ▶
+//                     </span>
+//                   )}
+//                 </button>
+
+//                 {/* Dropdown menyu */}
+//                 {!isCollapsed && (
+//                   <div
+//                     className={`fixed left-64 top-0 w-64 h-full bg-white shadow-2xl z-20 py-3 border-l border-gray-100 flex flex-col 
+//     transition-all duration-500 ease-in-out transform
+//     ${isSettingsOpen ? "translate-x-0 opacity-100 visible" : "-translate-x-4 opacity-0 invisible"}`}
+//                   >
+//                     {/* Sarlavha qismi */}
+//                     <div className="px-4 pb-3 border-b font-semibold text-gray-800 flex justify-between items-center">
+//                       <span>Menu</span>
+//                       <button
+//                         className="text-gray-400 hover:text-red-500 transition-colors"
+//                         onClick={() => setIsSettingsOpen(false)}
+//                       >
+//                         ✕
+//                       </button>
+//                     </div>
+
+//                     {/* Elementlar ro'yxati */}
+//                     <div className="mt-4 space-y-1">
+//                       {settingsItems.map((item) => (
+//                         <NavLink
+//                           key={item.id}
+//                           to={item.path}
+//                           onClick={() => setIsSettingsOpen(false)}
+//                           className={({ isActive }) =>
+//                             `flex items-center gap-3 px-4 py-3 mx-2 rounded-lg text-sm transition-all duration-300
+//                             ${isActive && !isSettingsOpen  ? "bg-[#1f39a1] text-white" : "text-gray-600 hover:bg-blue-50"}`
+//                           }
+//                         >
+//                           <item.icon className="w-4 h-4" />
+//                           {item.name}
+//                         </NavLink>
+//                       ))}
+//                     </div>
+//                   </div>
+//                 )}
+
+//               </li>
+//             </ul>
+//           </nav>
+//         </div>
+
+//         {/* Obuna kartasi (Tolov qismi) */}
+//         {!isCollapsed && (
+//           <div className="p-6">
+//             <div className="bg-gradient-to-r from-[#f0f4ff] to-red-50 rounded-xl shadow-sm p-4">
+//               <div className="flex justify-between items-start mb-4">
+//                 <div>
+//                   <h3 className="text-lg font-semibold text-gray-800">Obuna</h3>
+//                   <p className="text-gray-600 text-sm">Obunangiz tugagan</p>
+//                 </div>
+//                 <WarningIcon className="text-2xl text-orange-500" />
+//               </div>
+
+//               <div className="mb-4">
+//                 <div className="flex justify-between text-sm mb-1">
+//                   <span>Qolgan kunlar</span>
+//                   <span className="font-semibold text-[#1f39a1]">5 / 30</span>
+//                 </div>
+//                 <div className="w-full bg-gray-200 rounded-full h-2">
+//                   <div
+//                     className="bg-[#1f39a1] h-2 rounded-full"
+//                     style={{ width: "16%" }}
+//                   />
+//                 </div>
+//               </div>
+//               <button className="w-full bg-[#1f39a1] hover:bg-[#162870] text-white font-normal py-2 px-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+//                 <span>🔄</span> Obunani yangilash{" "}
+//               </button>
+
+//               <p className="text-xs text-gray-500 text-center mt-3">
+//                 Obuna muddati tugashiga 5 kun qoldi{" "}
+//               </p>
+//             </div>
+//           </div>
+//         )}
+//       </aside>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // // v1
 // dropdown ishladi
 
@@ -2637,3 +3275,91 @@ export default function Sidebar() {
 //     </div>
 //   );
 // }
+
+
+
+
+// async getAllGroups(search: filterDto) {
+//     const { groupName, max_student, status } = search;
+//     let searchWhere = {};
+
+//     if (status) {
+//       searchWhere["status"] = status;
+//     } else {
+//       searchWhere["status"] = "active"; // default
+//     }
+
+//     if (groupName) searchWhere["name"] = groupName;
+//     if (max_student) searchWhere["max_student"] = +max_student;
+
+//     const groups = await this.prisma.group.findMany({
+//       where: searchWhere,
+//       select: {
+//         id: true,
+//         name: true,
+//         max_student: true,
+//         start_date: true,
+//         start_time: true,
+//         week_day: true,
+//         status: true,
+//         description:true,
+//         courses: {
+//           select: {
+//             id: true,
+//             name: true,
+//             duration_month: true, // Kurs necha oy davom etishi
+//             duration_hours: true, // Jami dars soatlari
+//           },
+//         },
+//         rooms: {
+//           select: {
+//             id: true,
+//             name: true,
+//           },
+//         },
+//         groupTeachers: {
+//           select: {
+//             teacher: {
+//               select: {
+//                 id: true,
+//                 full_name: true,
+//               },
+//             },
+//           },
+//         },
+//         studentGroups: {
+//           select: {
+//             students: {
+//               select: {
+//                 _count: true,
+//                 id: true,
+//                 full_name:true
+//               },
+//             },
+//           },
+//         },
+//       },
+//     });
+
+//     const dataFormatter = groups.map((el) => ({
+//       id: el.id,
+//       name: el.name,
+//       start_date: el.start_date,
+//       start_time: el.start_time,
+//       weekDay: el.week_day,
+//       status: el.status,
+//       description: el.description,
+//       course: el.courses?.name || "Noma'lum",
+//       course_duration_month: el.courses?.duration_month || 0,
+//       course_duration_hours: el.courses?.duration_hours || 0,
+//       room: el.rooms?.name || "Noma'lum",
+//       teachers: el.groupTeachers?.map((gt) => gt.teacher) || [],
+//       students: el.studentGroups?.map((sg) => sg.students) || [],
+//       student_count: el.studentGroups?.length || 0,
+//     }));
+
+//     return {
+//       success: true,
+//       data: dataFormatter,
+//     };
+//   }

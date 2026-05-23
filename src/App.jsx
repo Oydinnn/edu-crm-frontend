@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "./contexts/SidebarContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -8,7 +10,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Teachers from "./pages/Teachers";
-import Classes from "./pages/Classes";
+import Groups from "./pages/Groups/index.jsx";
+import GroupInner from "./pages/Groups/GroupInner";
 import Students from "./pages/Students";
 import Courses from "./pages/Settings/Courses";
 import Rooms from "./pages/Settings/Rooms";
@@ -26,7 +29,9 @@ function RootRedirect() {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <LanguageProvider>
+        <ThemeProvider>
+          <BrowserRouter>
         <Routes>
           {/* 1. Login har doim eng tepada va wildcard yo'ldan tashqarida bo'lishi shart */}
           <Route path="/login" element={<Login />} />
@@ -44,7 +49,8 @@ function App() {
                       
                       <Route path="dashboard" element={<Dashboard />} />
                       <Route path="teachers" element={<Teachers />} />
-                      <Route path="classes" element={<Classes />} />
+                      <Route path="groups" element={<Groups />} />
+                      <Route path="groups/:id" element={<GroupInner />} />
                       <Route path="students" element={<Students />} />
 
                       {/* Settings (Boshqarish) nested yo'llari */}
@@ -65,7 +71,9 @@ function App() {
             }
           />
         </Routes>
-      </BrowserRouter>
+          </BrowserRouter>
+        </ThemeProvider>
+      </LanguageProvider>
     </AuthProvider>
   );
 }

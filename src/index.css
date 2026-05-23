@@ -1,6 +1,8 @@
 /* src/index.css */
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --color-primary: #4F46E5;
   --color-secondary: #10B981;
@@ -9,6 +11,11 @@
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f9fafb;
+  transition: background-color 300ms ease-in-out, color 300ms ease-in-out;
+}
+
+.dark body {
+  background-color: #020617; /* Tailwind slate-950 */
 }
 
 /* Scrollbar stillari */
@@ -20,11 +27,135 @@ body {
   background: #f1f1f1;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 3px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* ==========================================================================
+   GLOBAL DARK MODE OVERRIDES
+   Instantly skins all standard dashboard pages (modals, tables, inputs)
+   ========================================================================== */
+
+.dark .bg-white {
+  background-color: #0f172a !important; /* slate-900 for drawers/modals/cards */
+}
+
+/* For main backgrounds in pages */
+.dark .bg-gray-50,
+.dark .bg-gray-100/50,
+.dark .min-h-screen.bg-gray-50 {
+  background-color: #020617 !important; /* slate-950 */
+}
+
+.dark .bg-gray-100 {
+  background-color: #1e293b !important; /* slate-800 */
+}
+
+/* Border styles */
+.dark .border-gray-50,
+.dark .border-gray-100,
+.dark .border-gray-150,
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-gray-400 {
+  border-color: #1e293b !important; /* slate-800 */
+}
+
+/* Text styles */
+.dark .text-gray-800,
+.dark .text-gray-700,
+.dark .text-[#4a5568],
+.dark .text-slate-800 {
+  color: #f8fafc !important; /* slate-50 */
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500,
+.dark .text-gray-400 {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+/* Brand blue colors mapping to light blue in dark mode */
+.dark .text-\[\#1f39a1\],
+.dark .text-\[\#1f39a1\]\/60 {
+  color: #60a5fa !important; /* blue-400 */
+}
+
+.dark .bg-\[\#1f39a1\] {
+  background-color: #2563eb !important; /* blue-600 */
+}
+
+.dark .hover\:bg-\[\#162870\]:hover {
+  background-color: #1d4ed8 !important; /* blue-700 */
+}
+
+.dark .bg-\[\#f0f4ff\],
+.dark .bg-\[\#f0f4ff\]\/60 {
+  background-color: rgba(30, 41, 59, 0.6) !important;
+}
+
+.dark .bg-\[\#f0f4ff\]\/30 {
+  background-color: rgba(30, 41, 59, 0.3) !important;
+}
+
+.dark .hover\:bg-\[\#f0f4ff\]\/30:hover {
+  background-color: rgba(30, 41, 59, 0.4) !important;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: #1e293b !important;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: #1e293b !important;
+}
+
+/* Form Fields */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #1e293b !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #475569 !important; /* slate-600 */
+}
+
+/* Modals, popups, and dropdown containers */
+.dark .bg-white.shadow-2xl,
+.dark .bg-white.shadow-xl {
+  background-color: #0f172a !important; /* slate-900 */
+  border: 1px solid #1e293b !important;
+}
+
+.dark .bg-white.rounded-2xl {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
 }

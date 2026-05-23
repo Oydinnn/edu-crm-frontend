@@ -1,30 +1,137 @@
+import { useState, useRef, useEffect } from "react";
 import { useSidebar } from "../contexts/SidebarContext";
+import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function Navbar() {
+  const { user } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
+  const { lang, setLang, t } = useLanguage();
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+  const langDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (langDropdownRef.current && !langDropdownRef.current.contains(e.target)) {
+        setIsLangDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const getInitials = (name) => {
+    if (!name) return "C";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name[0].toUpperCase();
+  };
+
+  const displayName = user?.full_name || "Creator";
+  const displayRole = user?.role
+    ? user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase()
+    : "Admin";
+
+  const languages = [
+    { code: "uz", label: "UZB", flag: "🇺🇿" },
+    { code: "en", label: "ENG", flag: "🇬🇧" },
+    { code: "ru", label: "RUS", flag: "🇷🇺" }
+  ];
+
+  const currentLanguage = languages.find((l) => l.code === lang) || languages[0];
+
   return (
-    <header className="w-full  px-6 py-4 flex justify-between items-center sticky top-0 z-30 bg-gray-50">
+    <header className="w-full px-6 py-4 flex justify-between items-center sticky top-0 z-30 bg-gray-50 dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800/60 transition-all duration-300">
       <div>
-        <h2 className="text-xl font-semibold text-gray-800">
-          Salom, creator!
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white transition-colors duration-300">
+          {t("greeting", { name: displayName })}
         </h2>
-        <p className="text-gray-500 text-sm">
-          EduCRM platformasiga xush kelibsiz!
+        <p className="text-gray-500 dark:text-gray-400 text-sm transition-colors duration-300">
+          {t("welcome")}
         </p>
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="relative p-2 text-[#4a5568] hover:text-[#1f39a1] hover:bg-[#f0f4ff] rounded-lg transition">
-          <span className="text-xl">🔔</span>
+        {/* Dark Mode Switcher */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-300 shadow-sm hover:scale-105 cursor-pointer"
+          title={isDark ? "Light Mode" : "Dark Mode"}
+        >
+          {isDark ? (
+            <span className="text-xl leading-none">☀️</span>
+          ) : (
+            <span className="text-xl leading-none">🌙</span>
+          )}
+        </button>
+
+        {/* Language Selector Dropdown */}
+        <div className="relative" ref={langDropdownRef}>
+          <button
+            onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl transition-all duration-300 shadow-sm hover:scale-[1.02] cursor-pointer"
+          >
+            <span>{currentLanguage.flag}</span>
+            <span className="hidden sm:inline">{currentLanguage.label}</span>
+            <span className={`text-[10px] text-gray-400 transition-transform duration-300 ${isLangDropdownOpen ? "rotate-180" : ""}`}>
+              ▼
+            </span>
+          </button>
+
+          {isLangDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1 animate-fadeIn">
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => {
+                    setLang(l.code);
+                    setIsLangDropdownOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left font-medium transition-colors duration-200 cursor-pointer ${
+                    lang === l.code
+                      ? "bg-blue-50 dark:bg-slate-700 text-[#1f39a1] dark:text-blue-400"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                  }`}
+                >
+                  <span className="text-base">{l.flag}</span>
+                  <span>{l.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Notifications */}
+        <button className="relative p-2 text-[#4a5568] dark:text-gray-300 hover:text-[#1f39a1] dark:hover:text-blue-400 hover:bg-[#f0f4ff] dark:hover:bg-slate-800 rounded-xl transition-all duration-300 shadow-sm">
+          <span className="text-xl leading-none">🔔</span>
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
 
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#1f39a1] rounded-full flex items-center justify-center text-white font-bold">
-            C
+        <div className="flex items-center gap-3 border-l border-gray-200 dark:border-slate-700 pl-4">
+          {user?.photo ? (
+            <img
+              src={user.photo.startsWith("http") ? user.photo : `http://localhost:3000${user.photo}`}
+              alt={displayName}
+              className="w-10 h-10 rounded-full object-cover border border-[#1f39a1]/20 shadow-sm"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                const sibling = e.target.nextSibling;
+                if (sibling) sibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div
+            className="w-10 h-10 bg-[#1f39a1] rounded-full flex items-center justify-center text-white font-bold shadow-sm"
+            style={{ display: user?.photo ? 'none' : 'flex' }}
+          >
+            {getInitials(displayName)}
           </div>
           <div className="hidden md:block">
-            <p className="text-sm font-medium">Creator</p>
-            <p className="text-xs text-gray-500">Admin</p>
+            <p className="text-sm font-bold text-gray-800 dark:text-white transition-colors duration-300">{displayName}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold transition-colors duration-300">{displayRole}</p>
           </div>
         </div>
       </div>
