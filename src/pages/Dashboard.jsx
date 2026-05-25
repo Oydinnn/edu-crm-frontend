@@ -1,16 +1,3 @@
-
-// import DashboardPage from "../components/DashboardPage";
-
-// export default function Dashboard() {
-//   return (
-//     <div>
-//       <DashboardPage />
-//     </div>
-//   );
-// }
-
-
-
 import { useState, useEffect } from "react";
 import api from "../services/axios";
 import GroupIcon from "@mui/icons-material/Group";

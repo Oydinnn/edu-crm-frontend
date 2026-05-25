@@ -8,6 +8,13 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import api from "../../services/axios";
 import TeacherShowModal from "./TeacherShowModal";
 
+ function getPhotoUrl(photo) {
+  if (!photo) return null;
+  if (photo.startsWith('http')) return photo;
+  const base = import.meta.env.VITE_API_URL?.replace("/api/v1", "");
+  return `${base}${photo}`;
+}
+
 export default function TeachersPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -57,6 +64,7 @@ export default function TeachersPage() {
     try {
       const res = await api.get("/teachers");
       if (res?.data?.success) setTeachers(res.data.data);
+      
     } catch (error) {
       console.log(error);
     }
@@ -99,10 +107,11 @@ export default function TeachersPage() {
       photo: null,
     });
     if (teacher.photo) {
+      const photoUrl = getPhotoUrl(teacher.photo);
       // ✅ To'g'ri URL yaratish (photo field faqat filename)
-      const photoUrl = teacher.photo.startsWith('http') 
-        ? teacher.photo 
-        : `${import.meta.env.VITE_API_URL?.replace("/api/v1", "")}/files/${teacher.photo}`;
+      //const photoUrl = teacher.photo.startsWith('http') 
+      //  ? teacher.photo 
+      //  : `${import.meta.env.VITE_API_URL?.replace("/api/v1", "")}/files/${teacher.photo}`;
       setPhotoPreview(photoUrl);
     } else {
       setPhotoPreview(null);
@@ -176,18 +185,46 @@ export default function TeachersPage() {
     getGroups();
   }, []);
 
+ 
+
   function handleFormChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
+  // function handlePhotoChange(e) {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setForm((prev) => ({ ...prev, photo: file }));
+  //     setPhotoPreview(URL.createObjectURL(file));
+  //   }
+  // }
+
   function handlePhotoChange(e) {
-    const file = e.target.files[0];
-    if (file) {
-      setForm((prev) => ({ ...prev, photo: file }));
-      setPhotoPreview(URL.createObjectURL(file));
-    }
-  }
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Canvas orqali compress
+  const canvas = document.createElement('canvas');
+  const img = new Image();
+  img.onload = () => {
+    const MAX = 400; // px
+    let w = img.width, h = img.height;
+    if (w > h) { h = (h / w) * MAX; w = MAX; }
+    else { w = (w / h) * MAX; h = MAX; }
+    
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    
+    canvas.toBlob((blob) => {
+      const compressed = new File([blob], file.name, { type: 'image/jpeg' });
+      setForm(prev => ({ ...prev, photo: compressed }));
+      setPhotoPreview(URL.createObjectURL(compressed));
+    }, 'image/jpeg', 0.8); // 80% sifat
+  };
+  img.src = URL.createObjectURL(file);
+}
 
   function openGroupModal() {
     setTempSelectedGroups([...selectedGroups]);
@@ -333,9 +370,14 @@ export default function TeachersPage() {
                 <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1f39a1] flex items-center justify-center text-white text-xs font-semibold shrink-0">
                   {t.photo ? (
                     <img
-                      src={`${import.meta.env.VITE_API_URL?.replace("/api/v1", "")}${t.photo}`}
+                      //src={`${import.meta.env.VITE_API_URL?.replace("/api/v1", "")}${t.photo}`}
+                      src={getPhotoUrl(t.photo)}
                       alt={t.full_name}
+                      loading="lazy"
                       className="w-full h-full object-cover"
+                      onError={(e) => {     // ✅ 404 bo'lsa avatar ko'rsatadi
+                        e.target.style.display = 'none';
+                      }}
                     />
                   ) : (
                     <span className="uppercase">{t.full_name?.charAt(0) || "?"}</span>

@@ -43,9 +43,11 @@ export default function LoginPage() {
       if (response.data.success) {
         const token = response.data.accessToken;
         const role = response.data.data?.role || '';
+        const userData = response.data.data;
+        
         
         // ✅ Context orqali global state yangilash + localStorage
-        login(token);
+        login(token, userData);
         localStorage.setItem('role', role);
         
         console.log('Login success:', response);

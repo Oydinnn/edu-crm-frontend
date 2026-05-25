@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
   const fetchCurrentUser = async () => {
     try {
       const response = await api.get("/users/me");
+
       if (response.data.success) {
         setUser(response.data.data);
       } else {
@@ -34,11 +35,15 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
-  const login = async (token) => {
+  const login = async (token, userData = null) => {
     localStorage.setItem("token", token);
     setIsAuthenticated(true);
-    await fetchCurrentUser();
-  };
+    if (userData) {
+      setUser(userData); // ✅ /me chaqirmasdan to'g'ridan-to'g'ri set qiling
+    } else {
+      await fetchCurrentUser();
+    }
+   };
 
   const logout = () => {
     localStorage.removeItem("token");

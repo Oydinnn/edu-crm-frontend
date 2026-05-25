@@ -14,9 +14,12 @@ import PersonIcon from "@mui/icons-material/Person";
 import SchoolIcon from "@mui/icons-material/School";
 
 import api from "../../services/axios";
-import StudentAddModal from "./StudentAddModal";
-import StudentShowModal from "./StudentShowModal";
-import StudentEditModal from "./StudentEditModal";
+import { lazy, Suspense } from "react";
+
+const StudentAddModal  = lazy(() => import("./StudentAddModal"));
+const StudentShowModal = lazy(() => import("./StudentShowModal"));
+const StudentEditModal = lazy(() => import("./StudentEditModal"));
+
 
 // ── Kolonlar ──────────────────────────────────────────────────────────────────
 const COLS = [
@@ -90,24 +93,51 @@ export default function StudentsPage() {
   const [editStudent, setEditStudent] = useState(null);
   const [page, setPage] = useState(1);
   const ROWS_PER_PAGE = 3;
+ 
 
   // ── Yuklash ──
-  const fetchStudents = useCallback(async (status = "active") => {
-    try {
-      const res = await api.get(`/students?status=${status}`);
-      setStudents(res.data.data || []);
-      // fetchStudents da qo'shing:
-    } catch (err) {
-      console.error("Xato:", err);
-    }
-  }, []);
+  // const fetchStudents = useCallback(async (status = "active") => {
+  //   try {
+  //     const res = await api.get(`/students?status=${status}`);
+  //     setStudents(res.data.data || []);
+  //     // fetchStudents da qo'shing:
+  //   } catch (err) {
+  //     console.error("Xato:", err);
+  //   }
+  // }, []);
 
-  // useEffect(() => { fetchStudents("active"); }, []);
+  // // useEffect(() => { fetchStudents("active"); }, []);
 
-  useEffect(() => {
-    if (aktifTab === "talabalar") fetchStudents("active");
-    else fetchStudents("inactive");
-  }, [aktifTab]);
+  // useEffect(() => {
+  //   if (aktifTab === "talabalar") fetchStudents("active");
+  //   else fetchStudents("inactive");
+  // }, [aktifTab]);
+
+
+  // 1. Avval fetchStudents (useCallback)
+const fetchStudents = useCallback(async (status = "active") => {
+  try {
+    const res = await api.get(`/students?status=${status}`);
+    setStudents(res.data.data || []);
+  } catch (err) {
+    console.error("Xato:", err);
+  }
+}, []);
+
+// 2. Keyin groups state
+const [groups, setGroups] = useState([]);
+
+// Faqat bitta useEffect:
+useEffect(() => {
+  api.get("/groups/all")
+    .then((res) => setGroups(res.data?.data || []))
+    .catch(console.error);
+}, []);
+
+useEffect(() => {
+  if (aktifTab === "talabalar") fetchStudents("active");
+  else fetchStudents("inactive");
+}, [aktifTab]);
 
   // ── 3 nuqta menyuni tashqariga bosganda yopish ──
   useEffect(() => {
@@ -456,22 +486,30 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      {/* ── Modals ── */}
-      <StudentAddModal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        onSave={handleSave}
-      />
-      <StudentShowModal
-        student={showStudent}
-        onClose={() => setShowStudent(null)}
-        onEdit={(s) => { setShowStudent(null); setEditStudent(s); }}
-      />
-      <StudentEditModal
-        student={editStudent}
-        onClose={() => setEditStudent(null)}
-        onSave={handleEditSave}
-      />
+      {/* Modals */}
+      <Suspense fallback={null}>
+        {addOpen && (
+          <StudentAddModal
+            open={addOpen}
+            onClose={() => setAddOpen(false)}
+            onSave={handleSave}
+          />
+        )}
+        {showStudent && (
+          <StudentShowModal
+            student={showStudent}
+            onClose={() => setShowStudent(null)}
+            onEdit={(s) => { setShowStudent(null); setEditStudent(s); }}
+          />
+        )}
+        {editStudent && (
+          <StudentEditModal
+            student={editStudent}
+            onClose={() => setEditStudent(null)}
+            onSave={handleEditSave}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

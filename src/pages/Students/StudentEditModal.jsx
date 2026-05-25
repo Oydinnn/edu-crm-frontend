@@ -6,14 +6,13 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CircularProgress from "@mui/material/CircularProgress";
 import api from "../../services/axios";
 
-export default function StudentEditModal({ student, onClose, onSave }) {
+export default function StudentEditModal({ student, onClose, onSave, groups = []  }) {
   const [form, setForm]     = useState({});
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
 
   // Guruh
-  const [groups, setGroups]                     = useState([]);
   const [selectedGroups, setSelectedGroups]     = useState([]);
   const [tempSelectedGroups, setTempSelected]   = useState([]);
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
@@ -45,7 +44,6 @@ export default function StudentEditModal({ student, onClose, onSave }) {
   // Guruhlarni yuklab, keyin selectedGroups ni qayta set qiling
   api.get("/groups/all")
     .then((res) => {
-      setGroups(res.data?.data || res.data || []);
       // ✅ groups yuklanganidan keyin ham set qiling
       setSelectedGroups(existingGroupIds);
     })

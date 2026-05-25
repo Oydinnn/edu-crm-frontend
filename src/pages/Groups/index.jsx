@@ -51,7 +51,7 @@ function StatCard({ icon, label, value, bg, color }) {
   );
 }
 
-function GuruhQoshishModal({ onClose, onSave }) {
+function GuruhQoshishModal({ onClose, onSave, options  }) {
   // --- 1. FORM STATE (Backend kutgan formatda) ---
   const [forma, setForma] = useState({
     name: "",
@@ -67,35 +67,35 @@ function GuruhQoshishModal({ onClose, onSave }) {
   });
 
   // --- 2. BACKENDDAN KELGAN RO'YXATLAR ---
-  const [options, setOptions] = useState({
-    courses: [],
-    rooms: [],
-    allTeachers: [],
-    allStudents: [],
-  });
+  // const [options, setOptions] = useState({
+  //   courses: [],
+  //   rooms: [],
+  //   allTeachers: [],
+  //   allStudents: [],
+  // });
 
   // --- 3. MA'LUMOTLARNI YUKLASH ---
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [c, r, t, s] = await Promise.all([
-          api.get("/courses"),
-          api.get("/rooms"),
-          api.get("/teachers"),
-          api.get("/students"),
-        ]);
-        setOptions({
-          courses: c.data?.data || c.data,
-          rooms: r.data?.data || r.data,
-          allTeachers: t.data?.data || t.data,
-          allStudents: s.data?.data || s.data,
-        });
-      } catch (err) {
-        console.error("Yuklashda xato:", err);
-      }
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [c, r, t, s] = await Promise.all([
+  //         api.get("/courses"),
+  //         api.get("/rooms"),
+  //         api.get("/teachers"),
+  //         api.get("/students"),
+  //       ]);
+  //       setOptions({
+  //         courses: c.data?.data || c.data,
+  //         rooms: r.data?.data || r.data,
+  //         allTeachers: t.data?.data || t.data,
+  //         allStudents: s.data?.data || s.data,
+  //       });
+  //     } catch (err) {
+  //       console.error("Yuklashda xato:", err);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   // --- 4. YORDAMCHI FUNKSIYALAR ---
   const toggleSelection = (type, id) => {
@@ -358,7 +358,7 @@ function GuruhQoshishModal({ onClose, onSave }) {
   );
 }
 
-function GuruhTahrirlashModal({ guruh, onClose, onSave }) {
+function GuruhTahrirlashModal({ guruh, onClose, onSave, options  }) {
   // console.log("Guruh students:", guruh);
   // console.log("Guruh studentGroups:", guruh.studentGroups);
   const [forma, setForma] = useState({
@@ -376,35 +376,35 @@ function GuruhTahrirlashModal({ guruh, onClose, onSave }) {
     students: guruh.students?.map((s) => s.id).filter((id) => id) || [],
   });
 
-  const [options, setOptions] = useState({
-    courses: [],
-    rooms: [],
-    allTeachers: [],
-    allStudents: [],
-  });
+  // const [options, setOptions] = useState({
+  //   courses: [],
+  //   rooms: [],
+  //   allTeachers: [],
+  //   allStudents: [],
+  // });
 
-  // Options yuklash
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [c, r, t, s] = await Promise.all([
-          api.get("/courses"),
-          api.get("/rooms"),
-          api.get("/teachers"),
-          api.get("/students"),
-        ]);
-        setOptions({
-          courses: c.data?.data || c.data,
-          rooms: r.data?.data || r.data,
-          allTeachers: t.data?.data || t.data,
-          allStudents: s.data?.data || s.data,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchData();
-  }, []);
+  // // Options yuklash
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [c, r, t, s] = await Promise.all([
+  //         api.get("/courses"),
+  //         api.get("/rooms"),
+  //         api.get("/teachers"),
+  //         api.get("/students"),
+  //       ]);
+  //       setOptions({
+  //         courses: c.data?.data || c.data,
+  //         rooms: r.data?.data || r.data,
+  //         allTeachers: t.data?.data || t.data,
+  //         allStudents: s.data?.data || s.data,
+  //       });
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   const toggleSelection = (type, id) => {
     const numericId = Number(id);
@@ -813,22 +813,46 @@ export default function Groups() {
   const [tanlangan, setTanlangan] = useState(null); // tahrirlash uchun guruh
   const [korishModal, setKorishModal] = useState(false);
 
+
+  // ✅ Groups() component boshiga QO'SHING:
+  const [options, setOptions] = useState({
+    courses: [], rooms: [], allTeachers: [], allStudents: []
+  });
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const [c, r, t, s] = await Promise.all([
+        api.get("/courses"),
+        api.get("/rooms"),
+        api.get("/teachers"),
+        api.get("/students"),
+      ]);
+      setOptions({
+        courses: c.data?.data || [],
+        rooms: r.data?.data || [],
+        allTeachers: t.data?.data || [],
+        allStudents: s.data?.data || [],
+      });
+    };
+    fetchOptions();
+  }, []);
+
+
   // Groups() ichida getGroups funksiyasini o'zgartiring:
   const getGroups = async (status = "active") => {
+    console.time(`getGroups-${status}`);
     try {
       // status parametrini query ga qo'shamiz
       const res = await api.get(`/groups/all?status=${status}`);
+      console.timeEnd(`getGroups-${status}`);
       const list = res.data?.data ?? res.data;
       setGuruhlar(Array.isArray(list) ? list : []);
     } catch (error) {
+      console.timeEnd(`getGroups-${status}`);
       console.error("Xato:", error);
     }
   };
 
-  // Sahifa ochilganda — active guruhlar
-  useEffect(() => {
-    getGroups("active");
-  }, []);
 
   // Tab o'zgarganda — mos statusdagi guruhlarni yuklaymiz
   useEffect(() => {
@@ -1161,6 +1185,7 @@ export default function Groups() {
 
       {modalOchiq && (
         <GuruhQoshishModal
+          options={options}
           onClose={() => setModalOchiq(false)}
           onSave={guruhSaqlash}
         />
@@ -1169,6 +1194,7 @@ export default function Groups() {
       {tahrirlashModal && tanlangan && (
         <GuruhTahrirlashModal
           guruh={tanlangan}
+          options={options}
           onClose={() => {
             setTahrirlashModal(false);
             setTanlangan(null);

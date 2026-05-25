@@ -9,7 +9,7 @@ function getPhotoUrl(photo) {
     import.meta.env.VITE_API_URL?.replace("/api/v1", "") ||
     "http://localhost:3000";
   // Teachers page uses /files/
-  return `${base}/files/${photo}`;
+  return `${base}${photo}`;
 }
 
 const AVATAR_COLORS = [
@@ -39,29 +39,9 @@ function formatDate(iso) {
 }
 
 export default function TeacherShowModal({ teacher, onClose, onEdit }) {
-  const [detail, setDetail] = useState(null);
-  const [loading, setLoading] = useState(false);
+  
 
-  useEffect(() => {
-    if (!teacher?.id) return;
-    setDetail(null);
-    setLoading(true);
-    api
-      .get(`/teachers/${teacher.id}`)
-      .then((res) => {
-        const d = res.data.data || res.data;
-        setDetail({ 
-          ...teacher, 
-          ...d, 
-          created_at: d.created_at || teacher.created_at,
-          groups: d.groups || teacher.groups 
-        });
-      })
-      .catch(() => setDetail(teacher))
-      .finally(() => setLoading(false));
-  }, [teacher?.id]);
-
-  const data = detail || teacher;
+  const data =  teacher;
   const av = data
     ? AVATAR_COLORS[data.id % AVATAR_COLORS.length]
     : AVATAR_COLORS[0];
@@ -111,11 +91,7 @@ export default function TeacherShowModal({ teacher, onClose, onEdit }) {
 
         {/* Body */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
-          {loading ? (
-            <div className="flex justify-center py-10 text-gray-500">
-              Yuklanmoqda...
-            </div>
-          ) : data ? (
+          { data ? (
             <>
               {/* Info cards */}
               <div className="grid grid-cols-2 gap-4">
@@ -196,7 +172,7 @@ export default function TeacherShowModal({ teacher, onClose, onEdit }) {
           </button>
           <button
             onClick={() => onEdit(data)}
-            disabled={loading || !data}
+            disabled={ !data}
             className="flex-1 py-2.5 text-sm font-medium text-white bg-[#1f39a1] rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <Edit style={{ fontSize: 18 }} />

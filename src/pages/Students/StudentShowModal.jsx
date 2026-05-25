@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
 import { Close, Edit } from "@mui/icons-material";
-import api from "../../services/axios";
 
 function getPhotoUrl(photo) {
   if (!photo) return null;
@@ -38,29 +36,10 @@ function formatDate(iso) {
 }
 
 export default function StudentShowModal({ student, onClose, onEdit }) {
-  const [detail, setDetail] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!student?.id) return;
-    setDetail(null);
-    setLoading(true);
-    api
-      .get(`/students/${student.id}`)
-      .then((res) => {
-        const d = res.data.data;
-        setDetail({ 
-          ...student, 
-          ...d, 
-          created_at: d.created_at || student.created_at,
-          groups: d.groups || student.groups 
-        });
-      })
-      .catch(() => setDetail(student))
-      .finally(() => setLoading(false));
-  }, [student?.id]);
+ 
 
-  const data = detail || student;
+  const data = student;
   const av = data
     ? AVATAR_COLORS[data.id % AVATAR_COLORS.length]
     : AVATAR_COLORS[0];
@@ -110,11 +89,7 @@ export default function StudentShowModal({ student, onClose, onEdit }) {
 
         {/* Body */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
-          {loading ? (
-            <div className="flex justify-center py-10 text-gray-500">
-              Yuklanmoqda...
-            </div>
-          ) : data ? (
+          { data ? (
             <>
               {/* Info cards */}
               <div className="grid grid-cols-2 gap-4">
@@ -202,7 +177,7 @@ export default function StudentShowModal({ student, onClose, onEdit }) {
           </button>
           <button
             onClick={() => onEdit(data)}
-            disabled={loading || !data}
+            disabled={!data}
             className="flex-1 py-2.5 text-sm font-medium text-white bg-[#1f39a1] rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <Edit style={{ fontSize: 18 }} />
