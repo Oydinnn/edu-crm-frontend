@@ -1,7 +1,10 @@
 // GroupInner.jsx — Guruh ichki sahifasi (/groups/:id)
-// mentor, parametr, dars jadvali akkardionlari sahifasi
+// guruh mentorlari, parametrlar, dars jadvali akkardionlari sahifasi
+
+
+
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -84,10 +87,14 @@ function computeLessonDays(weekDays, year, month) {
 function Accordion({ title, defaultOpen = true, children }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-      <div className={`rounded-xl mb-4 overflow-hidden transition-all duration-300
-    ${ open
+    <div
+      className={`rounded-xl mb-4 overflow-hidden transition-all duration-300
+    ${
+      open
         ? "bg-white border border-gray-200 shadow-sm"
-        : "border border-transparent shadow-none" }`} >
+        : "border border-transparent shadow-none"
+    }`}
+    >
       <div
         onClick={() => setOpen((p) => !p)}
         className={`flex items-center justify-between px-5 py-3.5 cursor-pointer
@@ -230,7 +237,7 @@ function DayCard({ date, isCompleted, onClick }) {
   d.setHours(0, 0, 0, 0);
 
   const isToday = d.getTime() === bugun.getTime();
-  const isPast  = d < bugun;
+  const isPast = d < bugun;
 
   // isCompleted bo'lsa yashil rang
   const wrapCls = isCompleted
@@ -256,10 +263,11 @@ function DayCard({ date, isCompleted, onClick }) {
         : "text-[#4a5568]";
 
   return (
-    <div 
+    <div
       onClick={onClick}
       className={`flex flex-col items-center px-2.5 py-2 rounded-xl min-w-[44px]
-      border transition-all cursor-pointer ${wrapCls}`}>
+      border transition-all cursor-pointer ${wrapCls}`}
+    >
       <span className={`text-[10px] font-medium ${monthCls}`}>
         {OY_QISQA[d.getMonth()]}
       </span>
@@ -272,9 +280,18 @@ function DayCard({ date, isCompleted, onClick }) {
 // API javobi: { "1": { isActive, day: [{day, month, isCompleted}] }, "2": {...}, ... }
 // month nomi inglizcha: "February", "March", ...
 const MONTH_NAME_TO_IDX = {
-  January: 0, February: 1, March: 2, April: 3,
-  May: 4, June: 5, July: 6, August: 7,
-  September: 8, October: 9, November: 10, December: 11,
+  January: 0,
+  February: 1,
+  March: 2,
+  April: 3,
+  May: 4,
+  June: 5,
+  July: 6,
+  August: 7,
+  September: 8,
+  October: 9,
+  November: 10,
+  December: 11,
 };
 
 // Schedules obyektini tekis massivga aylantirish
@@ -309,12 +326,12 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
   const [schedules, setSchedules] = useState(null);
   const [schedulesLoading, setSchedulesLoading] = useState(true);
 
-  const startDate  = guruh.start_date ? new Date(guruh.start_date) : null;
-  const weekDays   = guruh.week_day || [];
+  const startDate = guruh.start_date ? new Date(guruh.start_date) : null;
+  const weekDays = guruh.week_day || [];
   const kursOylari = Math.ceil(
     Number(guruh.course_duration_month) ||
-    Number(guruh.course?.duration_month) ||
-    3
+      Number(guruh.course?.duration_month) ||
+      3,
   );
 
   const oquvOylari = [];
@@ -322,7 +339,7 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
     for (let i = 0; i < kursOylari; i++) {
       const rawMonth = startDate.getMonth() + i;
       oquvOylari.push({
-        year:  startDate.getFullYear() + Math.floor(rawMonth / 12),
+        year: startDate.getFullYear() + Math.floor(rawMonth / 12),
         month: rawMonth % 12,
         label: `${i + 1}-o'quv oyi`,
       });
@@ -333,7 +350,7 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
     if (!oquvOylari.length) return;
     const bugun = new Date();
     const idx = oquvOylari.findIndex(
-      (o) => o.year === bugun.getFullYear() && o.month === bugun.getMonth()
+      (o) => o.year === bugun.getFullYear() && o.month === bugun.getMonth(),
     );
     setTanlananOyIdx(idx >= 0 ? idx : 0);
   }, [guruh.id, oquvOylari.length]);
@@ -360,7 +377,7 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
     );
   }
 
-  const tanlananOy  = tanlananOyIdx !== null ? oquvOylari[tanlananOyIdx] : null;
+  const tanlananOy = tanlananOyIdx !== null ? oquvOylari[tanlananOyIdx] : null;
 
   // Schedules dan joriy oy kunlarini topish
   // Schedules bo'lmasa — computeLessonDays fallback
@@ -369,8 +386,7 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
       // API dagi barcha kunlarni yig'ib, shu oyga tegishlilarini qaytarish
       const allDays = schedules.flatMap((w) => w.days);
       const filtered = allDays.filter(
-        (d) =>
-          d.date.getFullYear() === year && d.date.getMonth() === month
+        (d) => d.date.getFullYear() === year && d.date.getMonth() === month,
       );
       if (filtered.length > 0) return filtered; // { date, isCompleted }
     }
@@ -387,15 +403,16 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
 
   return (
     <div className="p-5">
-
       {/* O'qituvchi qatorlari */}
       {guruh.teachers?.length > 0 && (
         <div className="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden mb-6">
           {guruh.teachers.map((t, i) => (
-            <div key={t.id || i}
+            <div
+              key={t.id || i}
               className="flex flex-wrap items-center gap-4 px-4 py-3
                 border-b border-gray-100 last:border-0
-                hover:bg-[#f0f4ff]/40 transition-all duration-200">
+                hover:bg-[#f0f4ff]/40 transition-all duration-200"
+            >
               <span className="text-sm font-medium text-[#1f39a1] w-44 shrink-0">
                 {t.full_name}
               </span>
@@ -448,7 +465,11 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
               </span>
 
               <button
-                onClick={() => setTanlananOyIdx((i) => Math.min(oquvOylari.length - 1, i + 1))}
+                onClick={() =>
+                  setTanlananOyIdx((i) =>
+                    Math.min(oquvOylari.length - 1, i + 1),
+                  )
+                }
                 disabled={tanlananOyIdx === oquvOylari.length - 1}
                 className="p-1.5 rounded-lg text-gray-400
                   hover:bg-[#f0f4ff] hover:text-[#1f39a1]
@@ -463,7 +484,12 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
           {darsKunlari.length > 0 ? (
             <div className="flex gap-2 flex-wrap mb-4">
               {darsKunlari.map((item, i) => (
-                <DayCard key={i} date={item.date} isCompleted={item.isCompleted} onClick={() => onDayClick(item.date)} />
+                <DayCard
+                  key={i}
+                  date={item.date}
+                  isCompleted={item.isCompleted}
+                  onClick={() => onDayClick(item.date)}
+                />
               ))}
             </div>
           ) : (
@@ -490,7 +516,12 @@ function DarsJadvaliContent({ guruh, onDayClick }) {
                 </p>
                 <div className="flex gap-2 flex-wrap">
                   {kunlar.map((item, i) => (
-                    <DayCard key={i} date={item.date} isCompleted={item.isCompleted} onClick={() => onDayClick(item.date)} />
+                    <DayCard
+                      key={i}
+                      date={item.date}
+                      isCompleted={item.isCompleted}
+                      onClick={() => onDayClick(item.date)}
+                    />
                   ))}
                 </div>
               </div>
@@ -525,12 +556,33 @@ const MAIN_TABS = [
 export default function GroupInner() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [guruh, setGuruh] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeTab, setActiveTab] = useState("info");
+
+  // read `?tab=` from URL and sync activeTab
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const t = params.get("tab");
+    if (t && MAIN_TABS.some((m) => m.key === t)) {
+      setActiveTab(t);
+    } else {
+      setActiveTab("info");
+    }
+  }, [location.search]);
+
+  const handleHeaderBack = () => {
+    if (activeTab !== "info") {
+      navigate(`/groups/${id}`);
+      return;
+    }
+
+    navigate("/groups");
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -584,7 +636,13 @@ export default function GroupInner() {
   }
 
   if (selectedDate) {
-    return <GroupLessonDay date={selectedDate} guruh={guruh} onBack={() => setSelectedDate(null)} />;
+    return (
+      <GroupLessonDay
+        date={selectedDate}
+        guruh={guruh}
+        onBack={() => setSelectedDate(null)}
+      />
+    );
   }
 
   return (
@@ -593,7 +651,7 @@ export default function GroupInner() {
         {/* ── Sarlavha ── */}
         <div className="flex items-center gap-3 mb-4 flex-wrap">
           <button
-            onClick={() => navigate("/groups")}
+            onClick={handleHeaderBack}
             className="p-1.5 rounded-lg text-gray-400
               hover:bg-[#f0f4ff] hover:text-[#1f39a1] transition-colors"
           >
@@ -619,7 +677,7 @@ export default function GroupInner() {
           {MAIN_TABS.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => navigate(`?tab=${tab.key}`)}
               className={`px-4 py-2.5 text-sm font-medium transition-all relative whitespace-nowrap
                 ${
                   activeTab === tab.key
@@ -657,14 +715,14 @@ export default function GroupInner() {
         )}
 
         {/* 2. Guruh darsliklari */}
-        {activeTab === "lessons" && (
-          <GroupLessons guruh={guruh} />
-        )}
+        {activeTab === "lessons" && <GroupLessons guruh={guruh} />}
 
         {/* 3. Akademik davomati */}
         {activeTab === "attendance" && (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-            <p className="text-sm">Akademik davomati bo'limi tez orada qo'shiladi</p>
+            <p className="text-sm">
+              Akademik davomati bo'limi tez orada qo'shiladi
+            </p>
           </div>
         )}
       </div>

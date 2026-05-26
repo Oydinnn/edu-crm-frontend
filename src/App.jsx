@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "./contexts/SidebarContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
@@ -14,6 +14,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Teachers = lazy(() => import("./pages/Teachers"));
 const Groups = lazy(() => import("./pages/Groups/index.jsx"));
 const GroupInner = lazy(() => import("./pages/Groups/GroupInner"));
+const GroupAddHomework = lazy(() => import("./pages/Groups/groupAddHomework"));
 const Students = lazy(() => import("./pages/Students"));
 const Courses = lazy(() => import("./pages/Settings/Courses"));
 const Rooms = lazy(() => import("./pages/Settings/Rooms"));
@@ -33,7 +34,7 @@ function PageLoader() {
 function RootRedirect() {
   const { isAuthenticated } = useAuth();
   // Agar auth yuklanayotgan bo'lsa (null bo'lsa), loading yoki bo'sh joy qaytaring
-  if (isAuthenticated === null) return null; 
+  if (isAuthenticated === null) return null;
   return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
 }
 
@@ -43,47 +44,61 @@ function App() {
       <LanguageProvider>
         <ThemeProvider>
           <BrowserRouter>
-        <Routes>
-          {/* 1. Login har doim eng tepada va wildcard yo'ldan tashqarida bo'lishi shart */}
-          <Route path="/login" element={<Login />} />
+            <Routes>
+              {/* 1. Login har doim eng tepada va wildcard yo'ldan tashqarida bo'lishi shart */}
+              <Route path="/login" element={<Login />} />
 
-          {/* 2. Barcha himoyalangan sahifalar bitta '/*' bloki ichida */}
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <SidebarProvider>
-                  <Layout>
-                    <Suspense fallback={<PageLoader />}>
-                      <Routes>
-                        {/* Bosh sahifaga kirganda (/) auth holatiga ko'ra yo'naltirish */}
-                        <Route path="/" element={<RootRedirect />} />
-                        
-                        <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="teachers" element={<Teachers />} />
-                        <Route path="groups" element={<Groups />} />
-                        <Route path="groups/:id" element={<GroupInner />} />
-                        <Route path="students" element={<Students />} />
+              {/* 2. Barcha himoyalangan sahifalar bitta '/*' bloki ichida */}
+              <Route
+                path="/*"
+                element={
+                  <ProtectedRoute>
+                    <SidebarProvider>
+                      <Layout>
+                        <Suspense fallback={<PageLoader />}>
+                          <Routes>
+                            {/* Bosh sahifaga kirganda (/) auth holatiga ko'ra yo'naltirish */}
+                            <Route path="/" element={<RootRedirect />} />
 
-                        {/* Settings (Boshqarish) nested yo'llari */}
-                        <Route path="settings" element={<SettingsIndex />}>
-                          <Route index element={<Navigate to="courses" replace />} />
-                          <Route path="courses" element={<Courses />} />
-                          <Route path="rooms" element={<Rooms />} />
-                          <Route path="staff" element={<Staff />} />
-                          <Route path="messages" element={<Messages />} />
-                        </Route>
+                            <Route path="dashboard" element={<Dashboard />} />
+                            <Route path="teachers" element={<Teachers />} />
+                            <Route path="groups" element={<Groups />} />
+                            <Route
+                              path="groups/:id/homework/create"
+                              element={<GroupAddHomework />}
+                            />
+                            <Route
+                              path="groups/:id/homework/new"
+                              element={<GroupAddHomework />}
+                            />
+                            <Route path="groups/:id" element={<GroupInner />} />
+                            <Route path="students" element={<Students />} />
 
-                        {/* Noma'lum yo'llarni dashboardga qaytarish */}
-                        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                      </Routes>
-                    </Suspense>
-                  </Layout>
-                </SidebarProvider>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+                            {/* Settings (Boshqarish) nested yo'llari */}
+                            <Route path="settings" element={<SettingsIndex />}>
+                              <Route
+                                index
+                                element={<Navigate to="courses" replace />}
+                              />
+                              <Route path="courses" element={<Courses />} />
+                              <Route path="rooms" element={<Rooms />} />
+                              <Route path="staff" element={<Staff />} />
+                              <Route path="messages" element={<Messages />} />
+                            </Route>
+
+                            {/* Noma'lum yo'llarni dashboardga qaytarish */}
+                            <Route
+                              path="*"
+                              element={<Navigate to="/dashboard" replace />}
+                            />
+                          </Routes>
+                        </Suspense>
+                      </Layout>
+                    </SidebarProvider>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
           </BrowserRouter>
         </ThemeProvider>
       </LanguageProvider>

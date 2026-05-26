@@ -1,10 +1,13 @@
 // GroupLessons.jsx — Guruh darsliklari tab kontenti
 import { useEffect, useState } from "react";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
-import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
+import PersonIcon from "@mui/icons-material/Person";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import api from "../../services/axios";
+import { useNavigate } from "react-router-dom";
 
 // ─── Sub-tablar ─────────────────────────────────────────────────
 const SUB_TABS = [
@@ -14,20 +17,24 @@ const SUB_TABS = [
   { key: "journal", label: "Jurnal" },
 ];
 
-const MAIN_TABS = [
-  { key: "info", label: "Ma'lumotlar" },
-  { key: "lessons", label: "Guruh darsliklari" },
-  { key: "attendance", label: "Akademik davomat" },
-];
-
 // ─── Sana formatlash ────────────────────────────────────────────
 function formatDateTime(dateStr) {
   if (!dateStr) return "—";
   const d = new Date(dateStr);
   const day = String(d.getDate()).padStart(2, "0");
   const mon = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ][d.getMonth()];
   const year = d.getFullYear();
   const hours = String(d.getHours()).padStart(2, "0");
@@ -40,37 +47,64 @@ function formatDate(dateStr) {
   const d = new Date(dateStr);
   const day = String(d.getDate()).padStart(2, "0");
   const mon = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ][d.getMonth()];
   const year = d.getFullYear();
   return `${day} ${mon}, ${year}`;
 }
 
+function addHours(dateStr, hours) {
+  if (!dateStr) return null;
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return null;
+  date.setHours(date.getHours() + hours);
+  return date.toISOString();
+}
+
+function getStudentCount(summary) {
+  return summary.studentsInGroup ?? summary.existStudentInGroup ?? 0;
+}
+
+function getHomeworkCount(lesson) {
+  return Array.isArray(lesson.homework) ? lesson.homework.length : 0;
+}
+
 // ─── Darsliklar jadvali ─────────────────────────────────────────
-function LessonsTable({ lessons, loading }) {
+function LessonsTable({ lessons, loading, summary }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#10b981]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1f39a1]" />
       </div>
     );
   }
 
   return (
-    <div className="w-full border border-gray-100 rounded-xl overflow-hidden">
+    <div className="w-full overflow-x-auto border-t border-gray-100">
+      <div className="min-w-[980px]">
       {/* Table header */}
-      <div className="flex items-center px-5 py-3.5 border-b border-gray-100 bg-gray-50/60">
+      <div className="flex items-center px-3 py-3.5 border-b border-gray-100 bg-white">
         <div className="w-12 text-xs font-bold text-gray-500">#</div>
         <div className="flex-1 text-xs font-bold text-gray-500">Mavzu</div>
         <div className="w-12 text-center">
-          <ThumbUpAltIcon style={{ fontSize: 14, color: "#9ca3af" }} />
+          <PersonIcon style={{ fontSize: 17, color: "#6b7280" }} />
         </div>
         <div className="w-12 text-center">
-          <ThumbDownAltIcon style={{ fontSize: 14, color: "#9ca3af" }} />
+          <AccessTimeIcon style={{ fontSize: 16, color: "#f59e0b" }} />
         </div>
         <div className="w-12 text-center">
-          <CheckCircleIcon style={{ fontSize: 14, color: "#9ca3af" }} />
+          <CheckCircleIcon style={{ fontSize: 16, color: "#14b8a6" }} />
         </div>
         <div className="w-36 text-xs font-bold text-gray-500 text-center">
           Berilgan vaqt
@@ -81,60 +115,85 @@ function LessonsTable({ lessons, loading }) {
         <div className="w-28 text-xs font-bold text-gray-500 text-center">
           Dars sanasi
         </div>
-        <div className="w-8" />
+        <div className="w-36 text-xs font-bold text-gray-500 text-center">
+          Amallar
+        </div>
       </div>
 
       {/* Table rows */}
       <div className="bg-white divide-y divide-gray-50">
         {lessons.length > 0 ? (
           lessons.map((lesson, idx) => {
-            // Rangni aniqlash: agar completed bo'lsa yashil, agar late bo'lsa qizil
-            const isCompleted = lesson.isCompleted || lesson.status === "completed";
-            const isLate = lesson.isLate || lesson.status === "late";
-            const topicBg = isLate
-              ? "bg-red-400 text-white rounded-md px-3 py-1"
-              : isCompleted
-                ? "bg-emerald-400 text-white rounded-md px-3 py-1"
-                : "";
-
             return (
               <div
                 key={lesson.id || idx}
-                className="flex items-center px-5 py-3.5 hover:bg-gray-50/50 transition-colors"
+                className="flex items-center px-3 py-3.5 even:bg-gray-50/70 hover:bg-[#f0f4ff]/40 transition-colors"
               >
                 <div className="w-12 text-sm text-gray-500 font-medium">
                   {idx + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span
-                    className={`text-sm font-medium ${
-                      topicBg || "text-gray-800"
-                    }`}
-                  >
+                  <span className="text-sm font-semibold text-gray-800 leading-5">
                     {lesson.topic || lesson.name || "—"}
                   </span>
                 </div>
                 <div className="w-12 text-center text-sm font-semibold text-gray-600">
-                  {lesson.likes ?? lesson.thumbs_up ?? 0}
+                  {lesson.student_count ?? getStudentCount(summary)}
                 </div>
                 <div className="w-12 text-center text-sm font-semibold text-gray-600">
-                  {lesson.dislikes ?? lesson.thumbs_down ?? 0}
+                  {lesson.homeworkPending ?? summary.homeworkPending ?? 0}
                 </div>
                 <div className="w-12 text-center text-sm font-semibold text-gray-600">
-                  {lesson.checks ?? lesson.completed_count ?? 0}
+                  {lesson.homeworkAccepted ??
+                    summary.homeworkAccepted ??
+                    getHomeworkCount(lesson)}
                 </div>
                 <div className="w-36 text-center text-xs text-gray-500 whitespace-pre-line leading-tight">
-                  {formatDateTime(lesson.given_at || lesson.created_at)}
+                  {formatDateTime(
+                    lesson.given_at ||
+                      lesson.homework?.[0]?.created_at ||
+                      lesson.created_at,
+                  )}
                 </div>
                 <div className="w-36 text-center text-xs text-gray-500 whitespace-pre-line leading-tight">
-                  {formatDateTime(lesson.due_at || lesson.deadline)}
+                  {formatDateTime(
+                    lesson.due_at ||
+                      lesson.deadline ||
+                      addHours(
+                        lesson.given_at ||
+                          lesson.homework?.[0]?.created_at ||
+                          lesson.created_at,
+                        20,
+                      ),
+                  )}
                 </div>
                 <div className="w-28 text-center text-xs text-gray-500">
                   {formatDate(lesson.lesson_date || lesson.date)}
                 </div>
-                <div className="w-8 flex justify-center">
-                  <button className="p-1 rounded-md text-gray-300 hover:text-gray-500 hover:bg-gray-100 transition-colors">
-                    <MoreVertIcon style={{ fontSize: 16 }} />
+                <div className="w-36 flex items-center justify-center gap-4">
+                  <button
+                    type="button"
+                    aria-label="Ko'rish"
+                    title="Ko'rish"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
+                  >
+                    <VisibilityIcon style={{ fontSize: 20 }} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Tahrirlash"
+                    title="Tahrirlash"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
+                  >
+                    <EditIcon style={{ fontSize: 20 }} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="O'chirish"
+                    title="O'chirish"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                  >
+                    <DeleteIcon style={{ fontSize: 20 }} />
                   </button>
                 </div>
               </div>
@@ -142,9 +201,10 @@ function LessonsTable({ lessons, loading }) {
           })
         ) : (
           <div className="px-5 py-12 text-center text-sm text-gray-400">
-            Hozircha darsliklar mavjud emas
+            Hozircha uy vazifalari mavjud emas
           </div>
         )}
+      </div>
       </div>
     </div>
   );
@@ -163,88 +223,37 @@ function PlaceholderContent({ title }) {
 // ASOSIY KOMPONENT
 // ════════════════════════════════════════════════════════════════
 export default function GroupLessons({ guruh }) {
-  const [activeSubTab, setActiveSubTab] = useState("lessons");
+  const navigate = useNavigate();
+  const [activeSubTab, setActiveSubTab] = useState("homework");
   const [lessons, setLessons] = useState([]);
+  const [summary, setSummary] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // ── Darsliklarni yuklash ──
+  // ── Uy vazifalarni yuklash ──
   useEffect(() => {
     if (!guruh?.id) return;
     setLoading(true);
     api
-      .get(`/groups/${guruh.id}/lessons`)
+      .get(`/homework/${guruh.id}`)
       .then((res) => {
-        const data = res.data?.data ?? res.data ?? [];
-        setLessons(Array.isArray(data) ? data : []);
+        const data = res.data?.data ?? res.data ?? {};
+        setLessons(Array.isArray(data.groupFormated) ? data.groupFormated : []);
+        setSummary({
+          homeworkPending: data.homeworkPending ?? 0,
+          homeworkAccepted: data.homeworkAccepted ?? 0,
+          existStudentInGroup: data.existStudentInGroup ?? 0,
+          studentsInGroup: data.studentsInGroup,
+        });
       })
       .catch(() => {
-        // Agar lessons endpointi bo'lmasa, schedules dan olishga harakat qilamiz
-        api
-          .get(`/groups/${guruh.id}/schedules`)
-          .then((res2) => {
-            const data = res2.data?.data ?? res2.data;
-            // schedules dan darslik ro'yxatini yaratish
-            if (data && typeof data === "object") {
-              const allLessons = [];
-              Object.values(data).forEach((week) => {
-                if (week.day && Array.isArray(week.day)) {
-                  week.day.forEach((d) => {
-                    allLessons.push({
-                      id: `${d.month}-${d.day}`,
-                      topic: d.topic || "",
-                      lesson_date: d.date,
-                      isCompleted: d.isCompleted,
-                      likes: d.likes || 0,
-                      dislikes: d.dislikes || 0,
-                      checks: d.checks || 0,
-                    });
-                  });
-                }
-              });
-              setLessons(allLessons);
-            } else {
-              setLessons([]);
-            }
-          })
-          .catch(() => setLessons([]))
-          .finally(() => setLoading(false));
-        return; // finally ni oldiga qo'ymaslik uchun
+        setLessons([]);
+        setSummary({});
       })
       .finally(() => setLoading(false));
   }, [guruh?.id]);
 
   return (
     <div>
-      {/* Header: group title + status */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
-          <button onClick={() => window.history.back()} className="p-1 rounded-md hover:bg-gray-100">
-            <svg className="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg>
-          </button>
-          <h2 className="text-2xl font-bold text-[#1f2937]">{guruh?.name || "Guruh"}</h2>
-          {guruh?.status && (
-            <span className={`ml-2 inline-block text-xs font-medium px-2.5 py-1 rounded-full ${guruh.status === "active" ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-600"}`}>
-              {guruh.status === "active" ? "Aktiv" : guruh.status}
-            </span>
-          )}
-        </div>
-        <div>
-          <button className="text-sm text-gray-600 bg-white border border-gray-100 px-3 py-1 rounded-lg">Statistika</button>
-        </div>
-      </div>
-
-      {/* Main tabs (Ma'lumotlar / Guruh darsliklari / Akademik davomat) */}
-      <div className="flex items-center gap-1 mb-4 border-b border-gray-100">
-        {MAIN_TABS.map((t) => (
-          <button
-            key={t.key}
-            className={`px-4 py-2 text-sm font-medium -mb-px ${t.key === "lessons" ? "text-[#1f39a1] border-b-2 border-[#1f39a1] font-semibold" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
       {/* Section title + inner small tabs */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
@@ -270,9 +279,8 @@ export default function GroupLessons({ guruh }) {
         {activeSubTab === "homework" || activeSubTab === "lessons" ? (
           <div>
             <button
-              className="px-4 py-2 text-sm font-semibold text-white bg-[#10b981]
-                rounded-lg shadow-sm shadow-emerald-200 hover:bg-[#059669]
-                transition-all duration-200"
+              onClick={() => navigate(`/groups/${guruh.id}/homework/create`)}
+              className="px-4 py-2 text-sm font-semibold text-white bg-[#1f39a1] rounded-lg shadow-md shadow-blue-200 hover:bg-[#162870] transition-all duration-200"
             >
               Uyga vazifa qo'shish
             </button>
@@ -282,20 +290,14 @@ export default function GroupLessons({ guruh }) {
 
       {/* ── Kontent ── */}
       {activeSubTab === "lessons" && (
-        <LessonsTable lessons={lessons} loading={loading} />
+        <LessonsTable lessons={lessons} loading={loading} summary={summary} />
       )}
       {activeSubTab === "homework" && (
-        <PlaceholderContent title="Uyga vazifa" />
+        <LessonsTable lessons={lessons} loading={loading} summary={summary} />
       )}
-      {activeSubTab === "videos" && (
-        <PlaceholderContent title="Videolar" />
-      )}
-      {activeSubTab === "exams" && (
-        <PlaceholderContent title="Imtihonlar" />
-      )}
-      {activeSubTab === "journal" && (
-        <PlaceholderContent title="Jurnal" />
-      )}
+      {activeSubTab === "videos" && <PlaceholderContent title="Videolar" />}
+      {activeSubTab === "exams" && <PlaceholderContent title="Imtihonlar" />}
+      {activeSubTab === "journal" && <PlaceholderContent title="Jurnal" />}
     </div>
   );
 }
