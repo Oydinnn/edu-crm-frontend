@@ -80,8 +80,30 @@ function getHomeworkCount(lesson) {
   return Array.isArray(lesson.homework) ? lesson.homework.length : 0;
 }
 
+function getTimeValue(dateStr) {
+  const date = new Date(dateStr);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+function mapLessonsToHomeworkRows(groupLessons) {
+  return groupLessons
+    .flatMap((lesson) =>
+      (lesson.homework || []).map((homework, homeworkIdx) => ({
+        ...homework,
+        row_id: homework.id || `${lesson.id}-${homework.created_at}-${homeworkIdx}`,
+        lesson_id: lesson.id,
+        lesson_created_at: lesson.created_at,
+        topic: lesson.topic,
+        homework: [homework],
+      })),
+    )
+    .sort((a, b) => getTimeValue(b.created_at) - getTimeValue(a.created_at));
+}
+
 // ─── Darsliklar jadvali ─────────────────────────────────────────
-function LessonsTable({ lessons, loading, summary }) {
+function LessonsTable({ lessons, loading, summary, groupId }) {
+  const navigate = useNavigate();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -126,8 +148,13 @@ function LessonsTable({ lessons, loading, summary }) {
           lessons.map((lesson, idx) => {
             return (
               <div
-                key={lesson.id || idx}
-                className="flex items-center px-3 py-3.5 even:bg-gray-50/70 hover:bg-[#f0f4ff]/40 transition-colors"
+                key={lesson.row_id || lesson.id || idx}
+                onClick={() =>
+                  navigate(`/groups/${groupId}/homework/${lesson.id}/checking`, {
+                    state: { homework: lesson },
+                  })
+                }
+                className="flex cursor-pointer items-center px-3 py-3.5 even:bg-gray-50/70 hover:bg-[#f0f4ff]/40 transition-colors"
               >
                 <div className="w-12 text-sm text-gray-500 font-medium">
                   {idx + 1}
@@ -149,32 +176,29 @@ function LessonsTable({ lessons, loading, summary }) {
                     getHomeworkCount(lesson)}
                 </div>
                 <div className="w-36 text-center text-xs text-gray-500 whitespace-pre-line leading-tight">
-                  {formatDateTime(
-                    lesson.given_at ||
-                      lesson.homework?.[0]?.created_at ||
-                      lesson.created_at,
-                  )}
+                  {formatDateTime(lesson.created_at)}
                 </div>
                 <div className="w-36 text-center text-xs text-gray-500 whitespace-pre-line leading-tight">
                   {formatDateTime(
                     lesson.due_at ||
                       lesson.deadline ||
-                      addHours(
-                        lesson.given_at ||
-                          lesson.homework?.[0]?.created_at ||
-                          lesson.created_at,
-                        20,
-                      ),
+                      addHours(lesson.created_at, 20),
                   )}
                 </div>
                 <div className="w-28 text-center text-xs text-gray-500">
-                  {formatDate(lesson.lesson_date || lesson.date)}
+                  {formatDate(lesson.lesson_created_at)}
                 </div>
                 <div className="w-36 flex items-center justify-center gap-4">
                   <button
                     type="button"
                     aria-label="Ko'rish"
                     title="Ko'rish"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/groups/${groupId}/homework/${lesson.id}/checking`, {
+                        state: { homework: lesson },
+                      });
+                    }}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
                   >
                     <VisibilityIcon style={{ fontSize: 20 }} />
@@ -183,6 +207,7 @@ function LessonsTable({ lessons, loading, summary }) {
                     type="button"
                     aria-label="Tahrirlash"
                     title="Tahrirlash"
+                    onClick={(e) => e.stopPropagation()}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
                   >
                     <EditIcon style={{ fontSize: 20 }} />
@@ -191,6 +216,7 @@ function LessonsTable({ lessons, loading, summary }) {
                     type="button"
                     aria-label="O'chirish"
                     title="O'chirish"
+                    onClick={(e) => e.stopPropagation()}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
                   >
                     <DeleteIcon style={{ fontSize: 20 }} />
@@ -234,10 +260,13 @@ export default function GroupLessons({ guruh }) {
     if (!guruh?.id) return;
     setLoading(true);
     api
-      .get(`/homework/${guruh.id}`)
+      .get(`/homework/group/${guruh.id}`)
       .then((res) => {
         const data = res.data?.data ?? res.data ?? {};
-        setLessons(Array.isArray(data.groupFormated) ? data.groupFormated : []);
+        const groupLessons = Array.isArray(data.groupFormated)
+          ? data.groupFormated
+          : [];
+        setLessons(mapLessonsToHomeworkRows(groupLessons));
         setSummary({
           homeworkPending: data.homeworkPending ?? 0,
           homeworkAccepted: data.homeworkAccepted ?? 0,
@@ -290,10 +319,20 @@ export default function GroupLessons({ guruh }) {
 
       {/* ── Kontent ── */}
       {activeSubTab === "lessons" && (
-        <LessonsTable lessons={lessons} loading={loading} summary={summary} />
+        <LessonsTable
+          lessons={lessons}
+          loading={loading}
+          summary={summary}
+          groupId={guruh.id}
+        />
       )}
       {activeSubTab === "homework" && (
-        <LessonsTable lessons={lessons} loading={loading} summary={summary} />
+        <LessonsTable
+          lessons={lessons}
+          loading={loading}
+          summary={summary}
+          groupId={guruh.id}
+        />
       )}
       {activeSubTab === "videos" && <PlaceholderContent title="Videolar" />}
       {activeSubTab === "exams" && <PlaceholderContent title="Imtihonlar" />}

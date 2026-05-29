@@ -13,6 +13,8 @@ import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import FormatIndentDecreaseIcon from "@mui/icons-material/FormatIndentDecrease";
 import FormatIndentIncreaseIcon from "@mui/icons-material/FormatIndentIncrease";
 import InsertLinkIcon from "@mui/icons-material/InsertLink";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import api from "../../services/axios";
 
 const toolbarIcons = [
@@ -39,12 +41,13 @@ export default function GroupAddHomework() {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
 
     api
-      .get(`/groups/${id}/lessons`)
+      .get(`/lessons/my/group/${id}`)
       .then((res) => {
         const data = res.data?.data ?? res.data ?? [];
         const list = Array.isArray(data) ? data : [];
@@ -74,16 +77,17 @@ export default function GroupAddHomework() {
     fd.append("lesson_id", selectedLesson);
     fd.append("group_id", id);
     fd.append("title", selectedLessonTitle);
-    if (description.trim()) fd.append("description", description.trim());
     if (file) fd.append("file", file);
 
     setLoading(true);
     try {
-      const res = await api.post(`/groups/${id}/homework/create`, fd, {
+      await api.post("/homework", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert(res.data?.message || "E'lon qilindi");
-      navigate(`/groups/${id}`);
+      setSuccessOpen(true);
+      setTimeout(() => {
+        navigate(`/groups/${id}?tab=lessons`);
+      }, 900);
     } catch (err) {
       alert(err.response?.data?.message || "Xatolik yuz berdi");
     } finally {
@@ -93,6 +97,22 @@ export default function GroupAddHomework() {
 
   return (
     <div className="min-h-[calc(100vh-96px)] bg-white px-0 py-0 text-[#1f2937] dark:bg-slate-950 dark:text-white">
+      <Snackbar
+        open={successOpen}
+        autoHideDuration={900}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        onClose={() => setSuccessOpen(false)}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={() => setSuccessOpen(false)}
+          sx={{ width: "100%" }}
+        >
+          Uyga vazifa e'lon qilindi!
+        </Alert>
+      </Snackbar>
+
       <form onSubmit={onPublish} className="w-full max-w-[472px]">
         <button
           type="button"

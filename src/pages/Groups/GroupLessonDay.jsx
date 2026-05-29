@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonIcon from "@mui/icons-material/Person";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import api from "../../services/axios";
 
 // Hafta kunlari va oylar (GroupInner.jsx bilan bir xil)
@@ -68,6 +70,7 @@ export default function GroupLessonDay({ date, guruh, onBack }) {
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState("");
+  const [successOpen, setSuccessOpen] = useState(false);
 
   // Guruh o'quvchilarini API dan yuklash
   useEffect(() => {
@@ -193,7 +196,7 @@ export default function GroupLessonDay({ date, guruh, onBack }) {
           console.error("refresh after save failed", e);
         }
       }
-      alert("Dars saqlandi");
+      setSuccessOpen(true);
     } catch (e) {
       console.error(e);
       const status = e?.response?.status;
@@ -265,6 +268,22 @@ export default function GroupLessonDay({ date, guruh, onBack }) {
 
   return (
     <div className="min-h-screen bg-white">
+      <Snackbar
+        open={successOpen}
+        autoHideDuration={2500}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        onClose={() => setSuccessOpen(false)}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={() => setSuccessOpen(false)}
+          sx={{ width: "100%" }}
+        >
+          Dars va yo'qlama saqlandi!
+        </Alert>
+      </Snackbar>
+
       <div className="p-4 sm:p-8 max-w-7xl mx-auto">
         {/* Header / Back button */}
         <div className="flex items-center gap-3 mb-8">
