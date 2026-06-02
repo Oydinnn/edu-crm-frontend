@@ -1,3 +1,9 @@
+//guruh darsliklari groupHomework.jsxdagi mavzuni ustiga bosgandagi ochiladigan sahifa
+//kutayotganlar, qaytarilganlar, qabul qilinganlar, bajarilmaganlar
+//har bir darslikni usti bosilganda shu darslikni bajarish uchun berilgan vaqt ko'rinishi kerak
+//bajarish vaqti bugundan + 20 soat
+//
+
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -205,7 +211,16 @@ export default function HomeworkChecking() {
                 {rows.map((student, index) => (
                   <div
                     key={student.id || index}
-                    className="grid grid-cols-[1fr_1fr] px-4 py-5 text-base text-gray-900 even:bg-gray-50"
+                    onClick={() => {
+                      if (activeTab === "pending") {
+                        navigate(`/groups/${id}/homework/${homeworkId}/pending/${student.id}`, {
+                          state: { homework },
+                        });
+                      }
+                    }}
+                    className={`grid grid-cols-[1fr_1fr] px-4 py-5 text-base text-gray-900 even:bg-gray-50 ${
+                      activeTab === "pending" ? "cursor-pointer hover:bg-[#f0f4ff]/40 transition-colors" : ""
+                    }`}
                   >
                     <div>{student.full_name || "—"}</div>
                     <div>{formatDateTime(student.sent_at || student.created_at)}</div>

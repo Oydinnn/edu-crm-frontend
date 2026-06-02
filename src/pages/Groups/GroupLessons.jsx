@@ -8,6 +8,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import api from "../../services/axios";
 import { useNavigate } from "react-router-dom";
+import VideoLessons from "./videoLessons";
+import Examination from "./Examination";
 
 // ─── Sub-tablar ─────────────────────────────────────────────────
 const SUB_TABS = [
@@ -115,122 +117,128 @@ function LessonsTable({ lessons, loading, summary, groupId }) {
   return (
     <div className="w-full overflow-x-auto border-t border-gray-100">
       <div className="min-w-[980px]">
-      {/* Table header */}
-      <div className="flex items-center px-3 py-3.5 border-b border-gray-100 bg-white">
-        <div className="w-12 text-xs font-bold text-gray-500">#</div>
-        <div className="flex-1 text-xs font-bold text-gray-500">Mavzu</div>
-        <div className="w-12 text-center">
-          <PersonIcon style={{ fontSize: 17, color: "#6b7280" }} />
+        {/* Table header */}
+        <div className="flex items-center px-3 py-3.5 border-b border-gray-100 bg-white">
+          <div className="w-12 text-xs font-bold text-gray-500">#</div>
+          <div className="flex-1 text-xs font-bold text-gray-500">Mavzu</div>
+          <div className="w-12 text-center">
+            <PersonIcon style={{ fontSize: 17, color: "#6b7280" }} />
+          </div>
+          <div className="w-12 text-center">
+            <AccessTimeIcon style={{ fontSize: 16, color: "#f59e0b" }} />
+          </div>
+          <div className="w-12 text-center">
+            <CheckCircleIcon style={{ fontSize: 16, color: "#14b8a6" }} />
+          </div>
+          <div className="w-36 text-xs font-bold text-gray-500 text-center">
+            Berilgan vaqt
+          </div>
+          <div className="w-36 text-xs font-bold text-gray-500 text-center">
+            Tugash vaqti
+          </div>
+          <div className="w-28 text-xs font-bold text-gray-500 text-center">
+            Dars sanasi
+          </div>
+          <div className="w-36 text-xs font-bold text-gray-500 text-center">
+            Amallar
+          </div>
         </div>
-        <div className="w-12 text-center">
-          <AccessTimeIcon style={{ fontSize: 16, color: "#f59e0b" }} />
-        </div>
-        <div className="w-12 text-center">
-          <CheckCircleIcon style={{ fontSize: 16, color: "#14b8a6" }} />
-        </div>
-        <div className="w-36 text-xs font-bold text-gray-500 text-center">
-          Berilgan vaqt
-        </div>
-        <div className="w-36 text-xs font-bold text-gray-500 text-center">
-          Tugash vaqti
-        </div>
-        <div className="w-28 text-xs font-bold text-gray-500 text-center">
-          Dars sanasi
-        </div>
-        <div className="w-36 text-xs font-bold text-gray-500 text-center">
-          Amallar
-        </div>
-      </div>
 
-      {/* Table rows */}
-      <div className="bg-white divide-y divide-gray-50">
-        {lessons.length > 0 ? (
-          lessons.map((lesson, idx) => {
-            return (
-              <div
-                key={lesson.row_id || lesson.id || idx}
-                onClick={() =>
-                  navigate(`/groups/${groupId}/homework/${lesson.id}/checking`, {
-                    state: { homework: lesson },
-                  })
-                }
-                className="flex cursor-pointer items-center px-3 py-3.5 even:bg-gray-50/70 hover:bg-[#f0f4ff]/40 transition-colors"
-              >
-                <div className="w-12 text-sm text-gray-500 font-medium">
-                  {idx + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-semibold text-gray-800 leading-5">
-                    {lesson.topic || lesson.name || "—"}
-                  </span>
-                </div>
-                <div className="w-12 text-center text-sm font-semibold text-gray-600">
-                  {lesson.student_count ?? getStudentCount(summary)}
-                </div>
-                <div className="w-12 text-center text-sm font-semibold text-gray-600">
-                  {lesson.homeworkPending ?? summary.homeworkPending ?? 0}
-                </div>
-                <div className="w-12 text-center text-sm font-semibold text-gray-600">
-                  {lesson.homeworkAccepted ??
-                    summary.homeworkAccepted ??
-                    getHomeworkCount(lesson)}
-                </div>
-                <div className="w-36 text-center text-xs text-gray-500 whitespace-pre-line leading-tight">
-                  {formatDateTime(lesson.created_at)}
-                </div>
-                <div className="w-36 text-center text-xs text-gray-500 whitespace-pre-line leading-tight">
-                  {formatDateTime(
-                    lesson.due_at ||
+        {/* Table rows */}
+        <div className="bg-white divide-y divide-gray-50">
+          {lessons.length > 0 ? (
+            lessons.map((lesson, idx) => {
+              return (
+                <div
+                  key={lesson.row_id || lesson.id || idx}
+                  onClick={() =>
+                    navigate(`/groups/${groupId}/homework/${lesson.id}/checking`, {
+                      state: { homework: lesson },
+                    })
+                  }
+                  className="flex cursor-pointer items-center px-3 py-3.5 even:bg-gray-50/70 hover:bg-[#f0f4ff]/40 transition-colors"
+                >
+                  <div className="w-12 text-sm text-gray-500 font-medium">
+                    {idx + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {(lesson.homeworkPending ?? 0) > 0 ? (
+                      <span className="inline-flex items-center w-[90%] px-4 py-1.5 bg-[#ff7654] text-white text-sm font-semibold rounded-full shadow-sm truncate">
+                        {lesson.topic || lesson.name || "—"}
+                      </span>
+                    ) : (
+                      <span className="text-sm font-semibold text-gray-800 leading-5">
+                        {lesson.topic || lesson.name || "—"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="w-12 text-center text-sm font-semibold text-gray-600">
+                    {lesson.student_count ?? getStudentCount(summary)}
+                  </div>
+                  <div className="w-12 text-center text-sm font-semibold text-gray-600">
+                    {lesson.homeworkPending ?? summary.homeworkPending ?? 0}
+                  </div>
+                  <div className="w-12 text-center text-sm font-semibold text-gray-600">
+                    {lesson.homeworkAccepted ??
+                      summary.homeworkAccepted ??
+                      getHomeworkCount(lesson)}
+                  </div>
+                  <div className="w-36 text-center text-xs text-gray-500 whitespace-pre-line leading-tight">
+                    {formatDateTime(lesson.created_at)}
+                  </div>
+                  <div className="w-36 text-center text-xs text-gray-500 whitespace-pre-line leading-tight">
+                    {formatDateTime(
+                      lesson.due_at ||
                       lesson.deadline ||
                       addHours(lesson.created_at, 20),
-                  )}
+                    )}
+                  </div>
+                  <div className="w-28 text-center text-xs text-gray-500">
+                    {formatDate(lesson.lesson_created_at)}
+                  </div>
+                  <div className="w-36 flex items-center justify-center gap-4">
+                    <button
+                      type="button"
+                      aria-label="Ko'rish"
+                      title="Ko'rish"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/groups/${groupId}/homework/${lesson.id}/checking`, {
+                          state: { homework: lesson },
+                        });
+                      }}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
+                    >
+                      <VisibilityIcon style={{ fontSize: 20 }} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Tahrirlash"
+                      title="Tahrirlash"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
+                    >
+                      <EditIcon style={{ fontSize: 20 }} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="O'chirish"
+                      title="O'chirish"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                    >
+                      <DeleteIcon style={{ fontSize: 20 }} />
+                    </button>
+                  </div>
                 </div>
-                <div className="w-28 text-center text-xs text-gray-500">
-                  {formatDate(lesson.lesson_created_at)}
-                </div>
-                <div className="w-36 flex items-center justify-center gap-4">
-                  <button
-                    type="button"
-                    aria-label="Ko'rish"
-                    title="Ko'rish"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/groups/${groupId}/homework/${lesson.id}/checking`, {
-                        state: { homework: lesson },
-                      });
-                    }}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
-                  >
-                    <VisibilityIcon style={{ fontSize: 20 }} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Tahrirlash"
-                    title="Tahrirlash"
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
-                  >
-                    <EditIcon style={{ fontSize: 20 }} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="O'chirish"
-                    title="O'chirish"
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
-                  >
-                    <DeleteIcon style={{ fontSize: 20 }} />
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="px-5 py-12 text-center text-sm text-gray-400">
-            Hozircha uy vazifalari mavjud emas
-          </div>
-        )}
-      </div>
+              );
+            })
+          ) : (
+            <div className="px-5 py-12 text-center text-sm text-gray-400">
+              Hozircha uy vazifalari mavjud emas
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -292,11 +300,10 @@ export default function GroupLessons({ guruh }) {
               <button
                 key={tab.key}
                 onClick={() => setActiveSubTab(tab.key)}
-                className={`text-sm px-3 py-1.5 rounded-md transition-all ${
-                  activeSubTab === tab.key
+                className={`text-sm px-3 py-1.5 rounded-md transition-all ${activeSubTab === tab.key
                     ? "bg-[#f0f6ff] text-[#1f39a1] font-semibold border border-[#e6f0ff]"
                     : "bg-white text-gray-500 border border-gray-100 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -334,8 +341,8 @@ export default function GroupLessons({ guruh }) {
           groupId={guruh.id}
         />
       )}
-      {activeSubTab === "videos" && <PlaceholderContent title="Videolar" />}
-      {activeSubTab === "exams" && <PlaceholderContent title="Imtihonlar" />}
+      {activeSubTab === "videos" && <VideoLessons guruh={guruh} />}
+      {activeSubTab === "exams" && <Examination guruh={guruh} />}
       {activeSubTab === "journal" && <PlaceholderContent title="Jurnal" />}
     </div>
   );

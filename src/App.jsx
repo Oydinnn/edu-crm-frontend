@@ -16,6 +16,7 @@ const Groups = lazy(() => import("./pages/Groups/index.jsx"));
 const GroupInner = lazy(() => import("./pages/Groups/GroupInner"));
 const GroupAddHomework = lazy(() => import("./pages/Groups/groupAddHomework"));
 const HomeworkChecking = lazy(() => import("./pages/Groups/homeworkChecking"));
+const HomeworkPending = lazy(() => import("./pages/Groups/HomeworkPending"));
 const Students = lazy(() => import("./pages/Students"));
 const Courses = lazy(() => import("./pages/Settings/Courses"));
 const Rooms = lazy(() => import("./pages/Settings/Rooms"));
@@ -75,6 +76,10 @@ function App() {
                             <Route
                               path="groups/:id/homework/:homeworkId/checking"
                               element={<HomeworkChecking />}
+                            />
+                            <Route
+                              path="groups/:id/homework/:homeworkId/pending/:studentId"
+                              element={<HomeworkPending />}
                             />
                             <Route path="groups/:id" element={<GroupInner />} />
                             <Route path="students" element={<Students />} />
