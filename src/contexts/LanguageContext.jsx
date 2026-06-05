@@ -76,7 +76,19 @@ const translations = {
     add_group: "Guruh qo'shish",
     edit_group: "Guruhni tahrirlash",
     group_name: "Guruh nomi *",
-    groups_not_found: "Guruhlar topilmadi"
+    groups_not_found: "Guruhlar topilmadi",
+
+    // Teacher Panel
+    teacher_groups_menu: "Guruhlar",
+    teacher_groups_all: "Guruhlar",
+    teacher_gathering_groups: "Yig'ilayotgan guruhlar",
+    teacher_profile: "Profil",
+    teacher_groups_title: "Mening guruhlarim",
+    teacher_groups_subtitle: "Sizga biriktirilgan guruhlar ro'yxati",
+    teacher_gathering_title: "Yig'ilayotgan guruhlar",
+    teacher_gathering_subtitle: "Hali to'liq yig'ilmagan guruhlar",
+    teacher_gathering_not_found: "Yig'ilayotgan guruhlar topilmadi",
+    teacher_profile_subtitle: "Shaxsiy ma'lumotlaringiz"
   },
   en: {
     // Navbar
@@ -151,7 +163,19 @@ const translations = {
     add_group: "Add Group",
     edit_group: "Edit Group",
     group_name: "Group Name *",
-    groups_not_found: "Groups not found"
+    groups_not_found: "Groups not found",
+
+    // Teacher Panel
+    teacher_groups_menu: "Groups",
+    teacher_groups_all: "Groups",
+    teacher_gathering_groups: "Gathering groups",
+    teacher_profile: "Profile",
+    teacher_groups_title: "My Groups",
+    teacher_groups_subtitle: "List of groups assigned to you",
+    teacher_gathering_title: "Gathering Groups",
+    teacher_gathering_subtitle: "Groups still being formed",
+    teacher_gathering_not_found: "No gathering groups found",
+    teacher_profile_subtitle: "Your personal information"
   },
   ru: {
     // Navbar
@@ -226,7 +250,19 @@ const translations = {
     add_group: "Добавить группу",
     edit_group: "Редактировать группу",
     group_name: "Название группы *",
-    groups_not_found: "Группы не найдены"
+    groups_not_found: "Группы не найдены",
+
+    // Teacher Panel
+    teacher_groups_menu: "Группы",
+    teacher_groups_all: "Группы",
+    teacher_gathering_groups: "Формирующиеся группы",
+    teacher_profile: "Профиль",
+    teacher_groups_title: "Мои группы",
+    teacher_groups_subtitle: "Список назначенных вам групп",
+    teacher_gathering_title: "Формирующиеся группы",
+    teacher_gathering_subtitle: "Группы, которые ещё формируются",
+    teacher_gathering_not_found: "Формирующиеся группы не найдены",
+    teacher_profile_subtitle: "Ваши личные данные"
   }
 };
 

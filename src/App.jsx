@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Layout from "./components/Layout";
+import TeacherLayout from "./components/TeacherLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Sahifalar
@@ -24,6 +25,11 @@ const Staff = lazy(() => import("./pages/Settings/Staff"));
 const Messages = lazy(() => import("./pages/Settings/Messages"));
 const SettingsIndex = lazy(() => import("./pages/Settings/Index"));
 
+// Teacher sahifalari
+const TeacherGroups = lazy(() => import("./pages/Teacher/TeacherGroups"));
+const TeacherGatheringGroups = lazy(() => import("./pages/Teacher/TeacherGatheringGroups"));
+const TeacherProfile = lazy(() => import("./pages/Teacher/TeacherProfile"));
+
 // Loading komponenti
 function PageLoader() {
   return (
@@ -33,11 +39,35 @@ function PageLoader() {
   );
 }
 
+// Role Guard — faqat ruxsat berilgan rollar uchun
+function RoleGuard({ allowedRoles, children }) {
+  const { role } = useAuth();
+  const userRole = role || localStorage.getItem("role") || "";
+
+  if (!allowedRoles.includes(userRole)) {
+    // Role mos kelmasa, to'g'ri sahifaga yo'naltirish
+    if (userRole === "TEACHER") {
+      return <Navigate to="/teacher/groups" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
 function RootRedirect() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
   // Agar auth yuklanayotgan bo'lsa (null bo'lsa), loading yoki bo'sh joy qaytaring
   if (isAuthenticated === null) return null;
-  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
+  
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  
+  // Role asosida yo'naltirish
+  const userRole = role || localStorage.getItem("role") || "";
+  if (userRole === "TEACHER") {
+    return <Navigate to="/teacher/groups" replace />;
+  }
+  return <Navigate to="/dashboard" replace />;
 }
 
 function App() {
@@ -47,64 +77,106 @@ function App() {
         <ThemeProvider>
           <BrowserRouter>
             <Routes>
-              {/* 1. Login har doim eng tepada va wildcard yo'ldan tashqarida bo'lishi shart */}
+              {/* 1. Login har doim eng tepada */}
               <Route path="/login" element={<Login />} />
 
-              {/* 2. Barcha himoyalangan sahifalar bitta '/*' bloki ichida */}
+              {/* 2. Teacher paneli yo'llari */}
+              <Route
+                path="/teacher/*"
+                element={
+                  <ProtectedRoute>
+                    <RoleGuard allowedRoles={["TEACHER"]}>
+                      <SidebarProvider>
+                        <TeacherLayout>
+                          <Suspense fallback={<PageLoader />}>
+                            <Routes>
+                              <Route path="groups" element={<TeacherGroups />} />
+                              <Route path="groups/:id" element={<GroupInner />} />
+                              <Route
+                                path="groups/:id/homework/create"
+                                element={<GroupAddHomework />}
+                              />
+                              <Route
+                                path="groups/:id/homework/new"
+                                element={<GroupAddHomework />}
+                              />
+                              <Route
+                                path="groups/:id/homework/:homeworkId/checking"
+                                element={<HomeworkChecking />}
+                              />
+                              <Route
+                                path="groups/:id/homework/:homeworkId/pending/:studentId"
+                                element={<HomeworkPending />}
+                              />
+                              <Route path="gathering-groups" element={<TeacherGatheringGroups />} />
+                              <Route path="profile" element={<TeacherProfile />} />
+                              <Route path="*" element={<Navigate to="/teacher/groups" replace />} />
+                            </Routes>
+                          </Suspense>
+                        </TeacherLayout>
+                      </SidebarProvider>
+                    </RoleGuard>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* 3. Admin/Superadmin paneli yo'llari */}
               <Route
                 path="/*"
                 element={
                   <ProtectedRoute>
-                    <SidebarProvider>
-                      <Layout>
-                        <Suspense fallback={<PageLoader />}>
-                          <Routes>
-                            {/* Bosh sahifaga kirganda (/) auth holatiga ko'ra yo'naltirish */}
-                            <Route path="/" element={<RootRedirect />} />
+                    <RoleGuard allowedRoles={["ADMIN", "SUPERADMIN", ""]}>
+                      <SidebarProvider>
+                        <Layout>
+                          <Suspense fallback={<PageLoader />}>
+                            <Routes>
+                              {/* Bosh sahifaga kirganda auth holatiga ko'ra yo'naltirish */}
+                              <Route path="/" element={<RootRedirect />} />
 
-                            <Route path="dashboard" element={<Dashboard />} />
-                            <Route path="teachers" element={<Teachers />} />
-                            <Route path="groups" element={<Groups />} />
-                            <Route
-                              path="groups/:id/homework/create"
-                              element={<GroupAddHomework />}
-                            />
-                            <Route
-                              path="groups/:id/homework/new"
-                              element={<GroupAddHomework />}
-                            />
-                            <Route
-                              path="groups/:id/homework/:homeworkId/checking"
-                              element={<HomeworkChecking />}
-                            />
-                            <Route
-                              path="groups/:id/homework/:homeworkId/pending/:studentId"
-                              element={<HomeworkPending />}
-                            />
-                            <Route path="groups/:id" element={<GroupInner />} />
-                            <Route path="students" element={<Students />} />
-
-                            {/* Settings (Boshqarish) nested yo'llari */}
-                            <Route path="settings" element={<SettingsIndex />}>
+                              <Route path="dashboard" element={<Dashboard />} />
+                              <Route path="teachers" element={<Teachers />} />
+                              <Route path="groups" element={<Groups />} />
                               <Route
-                                index
-                                element={<Navigate to="courses" replace />}
+                                path="groups/:id/homework/create"
+                                element={<GroupAddHomework />}
                               />
-                              <Route path="courses" element={<Courses />} />
-                              <Route path="rooms" element={<Rooms />} />
-                              <Route path="staff" element={<Staff />} />
-                              <Route path="messages" element={<Messages />} />
-                            </Route>
+                              <Route
+                                path="groups/:id/homework/new"
+                                element={<GroupAddHomework />}
+                              />
+                              <Route
+                                path="groups/:id/homework/:homeworkId/checking"
+                                element={<HomeworkChecking />}
+                              />
+                              <Route
+                                path="groups/:id/homework/:homeworkId/pending/:studentId"
+                                element={<HomeworkPending />}
+                              />
+                              <Route path="groups/:id" element={<GroupInner />} />
+                              <Route path="students" element={<Students />} />
 
-                            {/* Noma'lum yo'llarni dashboardga qaytarish */}
-                            <Route
-                              path="*"
-                              element={<Navigate to="/dashboard" replace />}
-                            />
-                          </Routes>
-                        </Suspense>
-                      </Layout>
-                    </SidebarProvider>
+                              {/* Settings (Boshqarish) nested yo'llari */}
+                              <Route path="settings" element={<SettingsIndex />}>
+                                <Route
+                                  index
+                                  element={<Navigate to="courses" replace />}
+                                />
+                                <Route path="courses" element={<Courses />} />
+                                <Route path="rooms" element={<Rooms />} />
+                                <Route path="staff" element={<Staff />} />
+                                <Route path="messages" element={<Messages />} />
+                              </Route>
+
+                              {/* Noma'lum yo'llarni dashboardga qaytarish */}
+                              <Route
+                                path="*"
+                                element={<Navigate to="/dashboard" replace />}
+                              />
+                            </Routes>
+                          </Suspense>
+                        </Layout>
+                      </SidebarProvider>
+                    </RoleGuard>
                   </ProtectedRoute>
                 }
               />

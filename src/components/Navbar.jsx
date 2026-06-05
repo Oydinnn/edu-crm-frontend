@@ -1,20 +1,28 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSidebar } from "../contexts/SidebarContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useLanguage } from "../contexts/LanguageContext";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function Navbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
   const { lang, setLang, t } = useLanguage();
+  const navigate = useNavigate();
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const langDropdownRef = useRef(null);
+  const profileDropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (langDropdownRef.current && !langDropdownRef.current.contains(e.target)) {
         setIsLangDropdownOpen(false);
+      }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target)) {
+        setIsProfileDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -28,6 +36,14 @@ export default function Navbar() {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
     return name[0].toUpperCase();
+  };
+
+  const getPhotoUrl = (photo) => {
+    if (!photo) return null;
+    if (photo.startsWith("http")) return photo;
+    const base = import.meta.env.VITE_API_URL?.replace("/api/v1", "") || "http://localhost:3000";
+    if (photo.startsWith("/")) return `${base}${photo}`;
+    return `${base}/uploads/${photo}`;
   };
 
   const displayName = user?.full_name || "Creator";
@@ -110,29 +126,89 @@ export default function Navbar() {
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
 
-        <div className="flex items-center gap-3 border-l border-gray-200 dark:border-slate-700 pl-4">
-          {user?.photo ? (
-            <img
-              src={user.photo.startsWith("http") ? user.photo : `http://localhost:3000${user.photo}`}
-              alt={displayName}
-              className="w-10 h-10 rounded-full object-cover border border-[#1f39a1]/20 shadow-sm"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                const sibling = e.target.nextSibling;
-                if (sibling) sibling.style.display = 'flex';
-              }}
-            />
-          ) : null}
-          <div
-            className="w-10 h-10 bg-[#1f39a1] rounded-full flex items-center justify-center text-white font-bold shadow-sm"
-            style={{ display: user?.photo ? 'none' : 'flex' }}
+        <div className="relative" ref={profileDropdownRef}>
+          <button
+            onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+            className="flex items-center gap-3 border-l border-gray-200 dark:border-slate-700 pl-4 cursor-pointer focus:outline-none hover:opacity-80 transition-opacity"
           >
-            {getInitials(displayName)}
-          </div>
-          <div className="hidden md:block">
-            <p className="text-sm font-bold text-gray-800 dark:text-white transition-colors duration-300">{displayName}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold transition-colors duration-300">{displayRole}</p>
-          </div>
+            {user?.photo ? (
+              <img
+                src={getPhotoUrl(user.photo)}
+                alt={displayName}
+                className="w-10 h-10 rounded-full object-cover border border-[#1f39a1]/20 shadow-sm"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  const sibling = e.target.nextSibling;
+                  if (sibling) sibling.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div
+              className="w-10 h-10 bg-[#1f39a1] rounded-full flex items-center justify-center text-white font-bold shadow-sm"
+              style={{ display: user?.photo ? 'none' : 'flex' }}
+            >
+              {getInitials(displayName)}
+            </div>
+            <div className="hidden md:block text-left">
+              <p className="text-sm font-bold text-gray-800 dark:text-white transition-colors duration-300">
+                {displayName}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold transition-colors duration-300 uppercase">
+                {displayRole}
+              </p>
+            </div>
+          </button>
+
+          {/* Profile Dropdown Menu */}
+          {isProfileDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-xl z-50 p-3 animate-fadeIn">
+              {/* User Info (Header) */}
+              <div className="flex items-center gap-3 p-2">
+                {user?.photo ? (
+                  <img
+                    src={getPhotoUrl(user.photo)}
+                    alt={displayName}
+                    className="w-10 h-10 rounded-full object-cover border border-[#1f39a1]/20 shadow-sm"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      const sibling = e.target.nextSibling;
+                      if (sibling) sibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div
+                  className="w-10 h-10 bg-[#1f39a1] rounded-full flex items-center justify-center text-white font-bold shadow-sm"
+                  style={{ display: user?.photo ? 'none' : 'flex' }}
+                >
+                  {getInitials(displayName)}
+                </div>
+                <div className="text-left overflow-hidden">
+                  <p className="text-sm font-bold text-gray-800 dark:text-white truncate">
+                    {displayName}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase truncate">
+                    {displayRole}
+                  </p>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="my-2 border-t border-gray-100 dark:border-slate-700" />
+
+              {/* Logout Button */}
+              <button
+                onClick={() => {
+                  logout();
+                  setIsProfileDropdownOpen(false);
+                  navigate("/login");
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors duration-200 cursor-pointer text-left"
+              >
+                <LogoutIcon className="w-5 h-5 text-red-500" />
+                <span>{t("logout") || "Chiqish"}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

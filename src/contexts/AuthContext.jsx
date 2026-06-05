@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
 
   const fetchCurrentUser = async () => {
     try {
@@ -26,8 +27,10 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem("token");
+      const savedRole = localStorage.getItem("role");
       if (token) {
         setIsAuthenticated(true);
+        setRole(savedRole);
         await fetchCurrentUser();
       }
       setIsLoading(false);
@@ -35,9 +38,11 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
-  const login = async (token, userData = null) => {
+  const login = async (token, userRole, userData = null) => {
     localStorage.setItem("token", token);
+    localStorage.setItem("role", userRole);
     setIsAuthenticated(true);
+    setRole(userRole);
     if (userData) {
       setUser(userData); // ✅ /me chaqirmasdan to'g'ridan-to'g'ri set qiling
     } else {
@@ -49,6 +54,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     setUser(null);
+    setRole(null);
     setIsAuthenticated(false);
   };
 
@@ -58,6 +64,7 @@ export function AuthProvider({ children }) {
         isAuthenticated,
         isLoading,
         user,
+        role,
         login,
         logout,
         fetchCurrentUser,

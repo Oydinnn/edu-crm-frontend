@@ -92,7 +92,7 @@ export default function StudentsPage() {
   const [showStudent, setShowStudent] = useState(null);
   const [editStudent, setEditStudent] = useState(null);
   const [page, setPage] = useState(1);
-  const ROWS_PER_PAGE = 3;
+  const ROWS_PER_PAGE = 10;
  
 
   // ── Yuklash ──

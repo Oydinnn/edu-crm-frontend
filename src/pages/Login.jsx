@@ -42,16 +42,20 @@ export default function LoginPage() {
 
       if (response.data.success) {
         const token = response.data.accessToken;
-        const role = response.data.data?.role || '';
+        const role = response.data.role || response.data.data?.role || '';
         const userData = response.data.data;
         
-        
         // ✅ Context orqali global state yangilash + localStorage
-        login(token, userData);
-        localStorage.setItem('role', role);
+        login(token, role, userData);
         
         console.log('Login success:', response);
-        navigate('/dashboard');
+        
+        // Role asosida yo'naltirish
+        if (role === 'TEACHER') {
+          navigate('/teacher/groups');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
       console.error('Login failed:', error);
