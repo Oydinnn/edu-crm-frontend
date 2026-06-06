@@ -6,19 +6,20 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Layout from "./components/Layout";
 import TeacherLayout from "./components/TeacherLayout";
+import StudentLayout from "./components/StudentLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Sahifalar
 import Login from "./pages/Login";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Teachers = lazy(() => import("./pages/Teachers"));
+const Teachers = lazy(() => import("./pages/Teacher/Teachers"));
 const Groups = lazy(() => import("./pages/Groups/index.jsx"));
 const GroupInner = lazy(() => import("./pages/Groups/GroupInner"));
 const GroupAddHomework = lazy(() => import("./pages/Groups/groupAddHomework"));
 const HomeworkChecking = lazy(() => import("./pages/Groups/homeworkChecking"));
 const HomeworkPending = lazy(() => import("./pages/Groups/HomeworkPending"));
-const Students = lazy(() => import("./pages/Students"));
+const Students = lazy(() => import("./pages/Student/Students"));
 const Courses = lazy(() => import("./pages/Settings/Courses"));
 const Rooms = lazy(() => import("./pages/Settings/Rooms"));
 const Staff = lazy(() => import("./pages/Settings/Staff"));
@@ -29,6 +30,17 @@ const SettingsIndex = lazy(() => import("./pages/Settings/Index"));
 const TeacherGroups = lazy(() => import("./pages/Teacher/TeacherGroups"));
 const TeacherGatheringGroups = lazy(() => import("./pages/Teacher/TeacherGatheringGroups"));
 const TeacherProfile = lazy(() => import("./pages/Teacher/TeacherProfile"));
+
+// Student sahifalari
+const StudentDashboard = lazy(() => import("./pages/Student/StudentDashboard"));
+const StudentGroups = lazy(() => import("./pages/Student/StudentGroups"));
+const StudentMyGroup = lazy(() => import("./pages/Student/my-group"));
+const StudentPayments = lazy(() => import("./pages/Student/StudentPayments"));
+const StudentIndicators = lazy(() => import("./pages/Student/StudentIndicators"));
+const StudentRating = lazy(() => import("./pages/Student/StudentRating"));
+const StudentShop = lazy(() => import("./pages/Student/StudentShop"));
+const StudentExtraLessons = lazy(() => import("./pages/Student/StudentExtraLessons"));
+const StudentSettings = lazy(() => import("./pages/Student/StudentSettings"));
 
 // Loading komponenti
 function PageLoader() {
@@ -49,6 +61,9 @@ function RoleGuard({ allowedRoles, children }) {
     if (userRole === "TEACHER") {
       return <Navigate to="/teacher/groups" replace />;
     }
+    if (userRole === "STUDENT") {
+      return <Navigate to="/student/groups" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -66,6 +81,9 @@ function RootRedirect() {
   const userRole = role || localStorage.getItem("role") || "";
   if (userRole === "TEACHER") {
     return <Navigate to="/teacher/groups" replace />;
+  }
+  if (userRole === "STUDENT") {
+    return <Navigate to="/student/groups" replace />;
   }
   return <Navigate to="/dashboard" replace />;
 }
@@ -120,7 +138,36 @@ function App() {
                 }
               />
 
-              {/* 3. Admin/Superadmin paneli yo'llari */}
+              {/* 3. Student paneli yo'llari */}
+              <Route
+                path="/student/*"
+                element={
+                  <ProtectedRoute>
+                    <RoleGuard allowedRoles={["STUDENT"]}>
+                      <SidebarProvider>
+                        <StudentLayout>
+                          <Suspense fallback={<PageLoader />}>
+                            <Routes>
+                              <Route path="dashboard" element={<StudentDashboard />} />
+                              <Route path="groups" element={<StudentGroups />} />
+                              <Route path="groups/:id" element={<StudentMyGroup />} />
+                              <Route path="payments" element={<StudentPayments />} />
+                              <Route path="indicators" element={<StudentIndicators />} />
+                              <Route path="rating" element={<StudentRating />} />
+                              <Route path="shop" element={<StudentShop />} />
+                              <Route path="extra-lessons" element={<StudentExtraLessons />} />
+                              <Route path="settings" element={<StudentSettings />} />
+                              <Route path="*" element={<Navigate to="/student/groups" replace />} />
+                            </Routes>
+                          </Suspense>
+                        </StudentLayout>
+                      </SidebarProvider>
+                    </RoleGuard>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* 4. Admin/Superadmin paneli yo'llari */}
               <Route
                 path="/*"
                 element={

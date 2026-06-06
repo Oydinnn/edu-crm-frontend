@@ -88,7 +88,24 @@ const translations = {
     teacher_gathering_title: "Yig'ilayotgan guruhlar",
     teacher_gathering_subtitle: "Hali to'liq yig'ilmagan guruhlar",
     teacher_gathering_not_found: "Yig'ilayotgan guruhlar topilmadi",
-    teacher_profile_subtitle: "Shaxsiy ma'lumotlaringiz"
+    teacher_profile_subtitle: "Shaxsiy ma'lumotlaringiz",
+
+    // Student Panel
+    student_home: "Bosh sahifa",
+    student_payments: "To'lovlarim",
+    student_groups: "Guruhlarim",
+    student_indicators: "Ko'rsatgichlarim",
+    student_rating: "Reyting",
+    student_shop: "Do`kon",
+    student_extra_lessons: "Qo'shimcha darslar",
+    student_settings: "Sozlamalar",
+    student_active: "Faol",
+    student_finished: "Tugagan",
+    student_active_groups: "Faol guruhlar",
+    student_completed_groups: "Tugatilgan guruhlar",
+    student_total_groups: "Jami guruhlar",
+    student_my_groups: "Mening guruhlarim",
+    student_dashboard_subtitle: "Sizning shaxsiy kabinetingiz"
   },
   en: {
     // Navbar
@@ -175,7 +192,24 @@ const translations = {
     teacher_gathering_title: "Gathering Groups",
     teacher_gathering_subtitle: "Groups still being formed",
     teacher_gathering_not_found: "No gathering groups found",
-    teacher_profile_subtitle: "Your personal information"
+    teacher_profile_subtitle: "Your personal information",
+
+    // Student Panel
+    student_home: "Home",
+    student_payments: "My Payments",
+    student_groups: "My Groups",
+    student_indicators: "My Indicators",
+    student_rating: "Rating",
+    student_shop: "Shop",
+    student_extra_lessons: "Extra Lessons",
+    student_settings: "Settings",
+    student_active: "Active",
+    student_finished: "Finished",
+    student_active_groups: "Active Groups",
+    student_completed_groups: "Completed Groups",
+    student_total_groups: "Total Groups",
+    student_my_groups: "My Groups",
+    student_dashboard_subtitle: "Your personal cabinet"
   },
   ru: {
     // Navbar
@@ -262,7 +296,24 @@ const translations = {
     teacher_gathering_title: "Формирующиеся группы",
     teacher_gathering_subtitle: "Группы, которые ещё формируются",
     teacher_gathering_not_found: "Формирующиеся группы не найдены",
-    teacher_profile_subtitle: "Ваши личные данные"
+    teacher_profile_subtitle: "Ваши личные данные",
+
+    // Student Panel
+    student_home: "Главная",
+    student_payments: "Мои платежи",
+    student_groups: "Мои группы",
+    student_indicators: "Мои показатели",
+    student_rating: "Рейтинг",
+    student_shop: "Магазин",
+    student_extra_lessons: "Дополнительные уроки",
+    student_settings: "Настройки",
+    student_active: "Активные",
+    student_finished: "Завершённые",
+    student_active_groups: "Активные группы",
+    student_completed_groups: "Завершённые группы",
+    student_total_groups: "Всего групп",
+    student_my_groups: "Мои группы",
+    student_dashboard_subtitle: "Ваш личный кабинет"
   }
 };
 

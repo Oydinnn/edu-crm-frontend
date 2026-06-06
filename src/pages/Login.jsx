@@ -53,6 +53,8 @@ export default function LoginPage() {
         // Role asosida yo'naltirish
         if (role === 'TEACHER') {
           navigate('/teacher/groups');
+        } else if (role === 'STUDENT') {
+          navigate('/student/groups');
         } else {
           navigate('/dashboard');
         }
