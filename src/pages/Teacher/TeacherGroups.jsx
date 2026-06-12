@@ -360,7 +360,8 @@ export default function TeacherGroups() {
                 {filteredGroups.map((guruh) => (
                   <div
                     key={guruh.id}
-                    className="flex items-center px-4 py-3.5 border-b border-gray-50 dark:border-slate-800/50 hover:bg-[#f0f4ff]/30 dark:hover:bg-slate-800/20 transition-all duration-300 min-w-max"
+                    onClick={() => navigate(`/teacher/groups/${guruh.id}`)}
+                    className="flex items-center px-4 py-3.5 border-b border-gray-50 dark:border-slate-800/50 hover:bg-[#f0f4ff]/40 dark:hover:bg-slate-800/30 transition-all duration-300 min-w-max cursor-pointer"
                   >
                     {/* Status indicator (Read-only toggle layout) */}
                     <div className="flex-1 px-1 flex items-center gap-1">
@@ -380,12 +381,9 @@ export default function TeacherGroups() {
 
                     {/* Guruh nomi */}
                     <div className="flex-1 px-1">
-                      <Link
-                        to={`/teacher/groups/${guruh.id}`}
-                        className="text-sm font-semibold text-[#1f39a1] dark:text-blue-400 hover:underline"
-                      >
+                      <span className="text-sm font-semibold text-[#1f39a1] dark:text-blue-400 hover:underline">
                         {guruh.name}
-                      </Link>
+                      </span>
                     </div>
 
                     {/* Kurs badge */}
@@ -433,12 +431,12 @@ export default function TeacherGroups() {
                     {/* Amallar */}
                     <div className="flex-1 px-1 flex items-center justify-center">
                       <button
-                        onClick={() => {
-                          setTanlanganGuruh(guruh);
-                          setKorishModal(true);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/teacher/groups/${guruh.id}`);
                         }}
                         className="p-1.5 rounded-lg text-gray-400 hover:bg-[#f0f4ff] dark:hover:bg-slate-800 hover:text-[#1f39a1] dark:hover:text-blue-400 transition-colors cursor-pointer"
-                        title="Batafsil ko'rish"
+                        title="Guruhga kirish"
                       >
                         <VisibilityIcon style={{ fontSize: 18 }} />
                       </button>

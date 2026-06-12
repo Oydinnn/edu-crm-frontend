@@ -7,7 +7,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import api from "../../services/axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import VideoLessons from "./videoLessons";
 import Examination from "./Examination";
 
@@ -103,7 +103,7 @@ function mapLessonsToHomeworkRows(groupLessons) {
 }
 
 // ─── Darsliklar jadvali ─────────────────────────────────────────
-function LessonsTable({ lessons, loading, summary, groupId }) {
+function LessonsTable({ lessons, loading, summary, groupId, groupsBase }) {
   const navigate = useNavigate();
 
   if (loading) {
@@ -152,7 +152,7 @@ function LessonsTable({ lessons, loading, summary, groupId }) {
                 <div
                   key={lesson.row_id || lesson.id || idx}
                   onClick={() =>
-                    navigate(`/groups/${groupId}/homework/${lesson.id}/checking`, {
+                    navigate(`${groupsBase}/${groupId}/homework/${lesson.id}/checking`, {
                       state: { homework: lesson },
                     })
                   }
@@ -203,7 +203,7 @@ function LessonsTable({ lessons, loading, summary, groupId }) {
                       title="Ko'rish"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/groups/${groupId}/homework/${lesson.id}/checking`, {
+                        navigate(`${groupsBase}/${groupId}/homework/${lesson.id}/checking`, {
                           state: { homework: lesson },
                         });
                       }}
@@ -258,6 +258,9 @@ function PlaceholderContent({ title }) {
 // ════════════════════════════════════════════════════════════════
 export default function GroupLessons({ guruh }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isTeacherPanel = location.pathname.startsWith("/teacher");
+  const groupsBase = isTeacherPanel ? "/teacher/groups" : "/groups";
   const [activeSubTab, setActiveSubTab] = useState("homework");
   const [lessons, setLessons] = useState([]);
   const [summary, setSummary] = useState({});
@@ -315,7 +318,7 @@ export default function GroupLessons({ guruh }) {
         {activeSubTab === "homework" || activeSubTab === "lessons" ? (
           <div>
             <button
-              onClick={() => navigate(`/groups/${guruh.id}/homework/create`)}
+              onClick={() => navigate(`${groupsBase}/${guruh.id}/homework/create`)}
               className="px-4 py-2 text-sm font-semibold text-white bg-[#1f39a1] rounded-lg shadow-md shadow-blue-200 hover:bg-[#162870] transition-all duration-200"
             >
               Uyga vazifa qo'shish
@@ -331,6 +334,7 @@ export default function GroupLessons({ guruh }) {
           loading={loading}
           summary={summary}
           groupId={guruh.id}
+          groupsBase={groupsBase}
         />
       )}
       {activeSubTab === "homework" && (
@@ -339,6 +343,7 @@ export default function GroupLessons({ guruh }) {
           loading={loading}
           summary={summary}
           groupId={guruh.id}
+          groupsBase={groupsBase}
         />
       )}
       {activeSubTab === "videos" && <VideoLessons guruh={guruh} />}

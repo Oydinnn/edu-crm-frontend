@@ -575,13 +575,16 @@ export default function GroupInner() {
     }
   }, [location.search]);
 
+  // Foydalanuvchi teacher panelida yoki admin panelida ekanligini aniqlash
+  const isTeacherPanel = location.pathname.startsWith("/teacher");
+  const groupsBase = isTeacherPanel ? "/teacher/groups" : "/groups";
+
   const handleHeaderBack = () => {
     if (activeTab !== "info") {
-      navigate(`/groups/${id}`);
+      navigate(`${groupsBase}/${id}`);
       return;
     }
-
-    navigate("/groups");
+    navigate(groupsBase);
   };
 
   useEffect(() => {

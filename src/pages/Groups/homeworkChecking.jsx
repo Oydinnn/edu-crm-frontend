@@ -12,7 +12,7 @@ import api from "../../services/axios";
 const TABS = [
   { key: "pending", label: "Kutayotganlar", statuses: ["PENDING"] },
   { key: "rejected", label: "Qaytarilganlar", statuses: ["REJECTED"] },
-  { key: "accepted", label: "Qabul qilinganlar", statuses: ["ACCEPTED", "CHECKED"] },
+  { key: "accepted", label: "Qabul qilinganlar", statuses: ["CHECKED"] },
   { key: "not_done", label: "Bajarilmagan", statuses: [] },
 ];
 
@@ -73,12 +73,14 @@ export default function HomeworkChecking() {
   const location = useLocation();
   const homeworkState = location.state?.homework || null;
 
+  const isTeacherPanel = location.pathname.startsWith("/teacher");
+  const groupsBase = isTeacherPanel ? "/teacher/groups" : "/groups";
+
   const [homework, setHomework] = useState(homeworkState);
   const [activeTab, setActiveTab] = useState("pending");
   const [rowsByTab, setRowsByTab] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const currentTab = useMemo(() => TABS.find((tab) => tab.key === activeTab) || TABS[0], [activeTab]);
 
   useEffect(() => {
     if (homework || !id || !homeworkId) return;
@@ -147,7 +149,7 @@ export default function HomeworkChecking() {
     <div className="min-h-screen bg-white p-6">
       <button
         type="button"
-        onClick={() => navigate(`/groups/${id}?tab=lessons`)}
+        onClick={() => navigate(`${groupsBase}/${id}?tab=lessons`)}
         className="mb-7 inline-flex items-center gap-3 text-2xl font-bold text-gray-900 transition-colors hover:text-[#1f39a1]"
       >
         <ArrowBackIosNewIcon sx={{ fontSize: 18, color: "#9ca3af" }} />
@@ -210,17 +212,31 @@ export default function HomeworkChecking() {
               <div className="divide-y divide-gray-100">
                 {rows.map((student, index) => (
                   <div
-                    key={student.id || index}
-                    onClick={() => {
-                      if (activeTab === "pending") {
-                        navigate(`/groups/${id}/homework/${homeworkId}/pending/${student.id}`, {
-                          state: { homework },
-                        });
-                      }
-                    }}
-                    className={`grid grid-cols-[1fr_1fr] px-4 py-5 text-base text-gray-900 even:bg-gray-50 ${
-                      activeTab === "pending" ? "cursor-pointer hover:bg-[#f0f4ff]/40 transition-colors" : ""
-                    }`}
+                      key={student.id || index}
+                      onClick={() => {
+                        if (activeTab === "accepted") {
+                          navigate(`${groupsBase}/${id}/homework/${homeworkId}/accepted/${student.id}`, {
+                            state: { homework },
+                          });
+                        } else if (activeTab === "rejected") {
+                          navigate(`${groupsBase}/${id}/homework/${homeworkId}/rejected/${student.id}`, {
+                            state: { homework },
+                          });
+                        } else if (activeTab === "pending") {
+                          navigate(`${groupsBase}/${id}/homework/${homeworkId}/pending/${student.id}`, {
+                            state: {
+                              homework,
+                              status: activeTab,
+                            },
+                          });
+                        }
+                        // not_done tab - no navigation needed
+                      }}
+                      className={`grid grid-cols-[1fr_1fr] px-4 py-5 text-base text-gray-900 even:bg-gray-50 transition-colors ${
+                        activeTab === "not_done"
+                          ? "cursor-default"
+                          : "cursor-pointer hover:bg-[#f0f4ff]/40"
+                      }`}
                   >
                     <div>{student.full_name || "—"}</div>
                     <div>{formatDateTime(student.sent_at || student.created_at)}</div>

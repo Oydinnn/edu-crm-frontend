@@ -65,6 +65,9 @@ export default function GroupAddHomework() {
     return lesson?.topic || lesson?.name || "Uyga vazifa";
   }, [lessons, selectedLesson]);
 
+  const isTeacherPanel = location.pathname.startsWith("/teacher");
+  const groupsBase = isTeacherPanel ? "/teacher/groups" : "/groups";
+
   const onPublish = async (e) => {
     e.preventDefault();
 
@@ -86,7 +89,7 @@ export default function GroupAddHomework() {
       });
       setSuccessOpen(true);
       setTimeout(() => {
-        navigate(`/groups/${id}?tab=lessons`);
+        navigate(`${groupsBase}/${id}?tab=lessons`);
       }, 900);
     } catch (err) {
       alert(err.response?.data?.message || "Xatolik yuz berdi");

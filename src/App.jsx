@@ -19,6 +19,8 @@ const GroupInner = lazy(() => import("./pages/Groups/GroupInner"));
 const GroupAddHomework = lazy(() => import("./pages/Groups/groupAddHomework"));
 const HomeworkChecking = lazy(() => import("./pages/Groups/homeworkChecking"));
 const HomeworkPending = lazy(() => import("./pages/Groups/HomeworkPending"));
+const AcceptedHomework = lazy(() => import("./pages/Groups/acceptedHomework"));
+const RejectedHomework = lazy(() => import("./pages/Groups/rejectedHomework"));
 const Students = lazy(() => import("./pages/Student/Students"));
 const Courses = lazy(() => import("./pages/Settings/Courses"));
 const Rooms = lazy(() => import("./pages/Settings/Rooms"));
@@ -35,6 +37,7 @@ const TeacherProfile = lazy(() => import("./pages/Teacher/TeacherProfile"));
 const StudentDashboard = lazy(() => import("./pages/Student/StudentDashboard"));
 const StudentGroups = lazy(() => import("./pages/Student/StudentGroups"));
 const StudentMyGroup = lazy(() => import("./pages/Student/my-group"));
+const StudentMyGroupLessonHomework = lazy(() => import("./pages/Student/my-groupLessonHomework"));
 const StudentPayments = lazy(() => import("./pages/Student/StudentPayments"));
 const StudentIndicators = lazy(() => import("./pages/Student/StudentIndicators"));
 const StudentRating = lazy(() => import("./pages/Student/StudentRating"));
@@ -109,7 +112,6 @@ function App() {
                           <Suspense fallback={<PageLoader />}>
                             <Routes>
                               <Route path="groups" element={<TeacherGroups />} />
-                              <Route path="groups/:id" element={<GroupInner />} />
                               <Route
                                 path="groups/:id/homework/create"
                                 element={<GroupAddHomework />}
@@ -126,6 +128,15 @@ function App() {
                                 path="groups/:id/homework/:homeworkId/pending/:studentId"
                                 element={<HomeworkPending />}
                               />
+                              <Route
+                                path="groups/:id/homework/:homeworkId/accepted/:studentId"
+                                element={<AcceptedHomework />}
+                              />
+                              <Route
+                                path="groups/:id/homework/:homeworkId/rejected/:studentId"
+                                element={<RejectedHomework />}
+                              />
+                              <Route path="groups/:id" element={<GroupInner />} />
                               <Route path="gathering-groups" element={<TeacherGatheringGroups />} />
                               <Route path="profile" element={<TeacherProfile />} />
                               <Route path="*" element={<Navigate to="/teacher/groups" replace />} />
@@ -151,6 +162,7 @@ function App() {
                               <Route path="dashboard" element={<StudentDashboard />} />
                               <Route path="groups" element={<StudentGroups />} />
                               <Route path="groups/:id" element={<StudentMyGroup />} />
+                              <Route path="groups/:groupId/lesson/:lessonId" element={<StudentMyGroupLessonHomework />} />
                               <Route path="payments" element={<StudentPayments />} />
                               <Route path="indicators" element={<StudentIndicators />} />
                               <Route path="rating" element={<StudentRating />} />
@@ -198,6 +210,14 @@ function App() {
                               <Route
                                 path="groups/:id/homework/:homeworkId/pending/:studentId"
                                 element={<HomeworkPending />}
+                              />
+                              <Route
+                                path="groups/:id/homework/:homeworkId/accepted/:studentId"
+                                element={<AcceptedHomework />}
+                              />
+                              <Route
+                                path="groups/:id/homework/:homeworkId/rejected/:studentId"
+                                element={<RejectedHomework />}
                               />
                               <Route path="groups/:id" element={<GroupInner />} />
                               <Route path="students" element={<Students />} />

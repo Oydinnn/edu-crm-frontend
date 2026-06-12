@@ -292,7 +292,7 @@ export default function StudentGroups() {
 
                     {/* Guruh nomi */}
                     <div className="flex-1 px-1">
-                      <span className="text-sm font-semibold text-[#4a5568] dark:text-gray-200">
+                      <span className="text-sm font-medium text-[#4a5568] dark:text-gray-200">
                         {guruh.groupName}
                       </span>
                     </div>
@@ -317,7 +317,7 @@ export default function StudentGroups() {
                     >
                       {guruh.teacherCount > 0 ? (
                         <>
-                          <div className="w-7 h-7 bg-[#1f39a1] rounded-full flex items-center justify-center text-white font-bold text-xs border-2 border-white dark:border-slate-800 shadow-sm">
+                          <div className="w-7 h-7 bg-white  rounded-full flex items-center justify-center text-[#1f39a1] text-xs border-1 border-[#1f39a1]  shadow-sm">
                             {guruh.teacherCount}
                           </div>
                           <span className="text-sm text-[#4a5568] dark:text-gray-300 truncate max-w-[120px]">

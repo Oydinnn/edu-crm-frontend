@@ -293,33 +293,37 @@ export default function StudentMyGroup() {
                     </tr>
                   </thead>
 
-                  <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
+                  <tbody className="divide-y divide-gray-50 dark:divide-slate-800 ">
                     {sorted.map((lesson, idx) => {
                       const st     = STATUS_MAP[lesson.status] || STATUS_MAP.berilmagan;
                       const dl     = deadline(lesson);
                       return (
                         <tr
                           key={idx}
-                          className="hover:bg-[#f8faff] dark:hover:bg-slate-800/20 transition-colors"
+                          onClick={() => navigate(`/student/groups/${id}/lesson/${lesson.id}`)}
+                          className="hover:bg-[#f0f4ff] dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                         >
                           {/* Mavzu */}
-                          <td className="px-6 py-4 text-sm  text-gray-800 dark:text-gray-200 max-w-[260px]">
-                            <span className="truncate block" title={lesson.topic}>
+                          <td className="px-6 py-1 text-sm text-gray-800 dark:text-gray-200 max-w-[260px]">
+                            <span
+                              className="truncate block text-gray-600 dark:text-gray-400 hover:text-[#1f39a1] hover:underline font-medium transition-colors"
+                              title={lesson.topic}
+                            >
                               {lesson.topic}
                             </span>
                           </td>
 
                           {/* Video soni */}
-                          <td className="px-6 py-4 text-center">
+                          <td className="px-6 py-1 text-center">
                             <div className="flex justify-center">
-                              <span className="w-7 h-7 rounded-full border-1 border-blue-400 text-blue-500 flex items-center justify-center text-xs">
+                              <span className="w-7 h-7 rounded-full border-1 border-[#1f39a1] text-[#1f39a1] flex items-center justify-center text-xs">
                                 {lesson.videoCount ?? 0}
                               </span>
                             </div>
                           </td>
 
-                          {/* Status badge — dropdown bilan bir xil o'lcham va stil */}
-                          <td className="px-6 py-4 text-center">
+                          {/* Status badge */}
+                          <td className="px-6 py-2 text-center">
                             <span
                               className="inline-flex items-center justify-center text-[15px] font-medium text-white rounded-lg"
                               style={{
@@ -335,12 +339,12 @@ export default function StudentMyGroup() {
                           </td>
 
                           {/* Deadline */}
-                          <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 text-center whitespace-nowrap">
+                          <td className="px-6 py-2 text-sm text-gray-600 dark:text-gray-400 text-center whitespace-nowrap">
                             {dl}
                           </td>
 
                           {/* Dars sanasi */}
-                          <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 text-center whitespace-nowrap">
+                          <td className="px-6 py-2 text-sm text-gray-600 dark:text-gray-400 text-center whitespace-nowrap">
                             {formatDateUz(lesson.created_at)}
                           </td>
                         </tr>

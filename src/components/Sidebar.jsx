@@ -113,11 +113,11 @@ export default function Sidebar() {
             <NavLink
               to="/dashboard"
               onClick={() => setIsSettingsOpen(false)}
-              className="flex items-center gap-2 p-2 hover:scale-110 transition-transform duration-300"
+              className="group flex items-center gap-2 p-2 hover:scale-110 transition-transform duration-300"
             >
               <img src={Logo} className="w-8 h-8 dark:filter dark:invert dark:brightness-125" alt="Logo" />
               {!isCollapsed && (
-                <h1 className="text-xl font-bold text-[#4a5568] dark:text-white transition-colors duration-300">
+                <h1 className="text-xl font-bold text-[#4a5568] dark:text-white group-hover:text-[#1f39a1] dark:group-hover:text-[#1f39a1] transition-colors duration-300">
                   EduCRM
                 </h1>
               )}
