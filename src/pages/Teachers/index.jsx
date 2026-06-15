@@ -192,13 +192,6 @@ export default function TeachersPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  // function handlePhotoChange(e) {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     setForm((prev) => ({ ...prev, photo: file }));
-  //     setPhotoPreview(URL.createObjectURL(file));
-  //   }
-  // }
 
   function handlePhotoChange(e) {
   const file = e.target.files[0];

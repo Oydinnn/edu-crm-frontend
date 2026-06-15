@@ -4,6 +4,8 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import api from "../../services/axios";
 
 const INITIAL_FORM = {
@@ -20,6 +22,7 @@ export default function StudentAddModal({ open, onClose, onSave }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [saving, setSaving] = useState(false);
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [successAlert, setSuccessAlert] = useState(false);
 
   // Guruh modal
   const [groups, setGroups] = useState([]);
@@ -88,6 +91,7 @@ export default function StudentAddModal({ open, onClose, onSave }) {
       setForm(INITIAL_FORM);
       setSelectedGroups([]);
       setPhotoPreview(null);
+      setSuccessAlert(true);
     } finally {
       setSaving(false);
     }
@@ -140,6 +144,8 @@ export default function StudentAddModal({ open, onClose, onSave }) {
             <label className="text-sm font-medium text-gray-700 mb-1 block">Telefon raqam *</label>
             <input
               type="tel"
+              name="phone"
+              autoComplete="tel"
               value={form.phone}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
               placeholder="998901234567"
@@ -152,9 +158,11 @@ export default function StudentAddModal({ open, onClose, onSave }) {
             <label className="text-sm font-medium text-gray-700 mb-1 block">Email</label>
             <input
               type="email"
+              name="email"
+              autoComplete="email"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              placeholder="Elektron pochtani kiriting"
+              placeholder="example@gmail.com"
               className={inputCls}
             />
           </div>
@@ -164,6 +172,8 @@ export default function StudentAddModal({ open, onClose, onSave }) {
             <label className="text-sm font-medium text-gray-700 mb-1 block">Parol *</label>
             <input
               type="password"
+              name="new-password"
+              autoComplete="new-password"
               value={form.password}
               onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
               placeholder="Parolni kiriting"
@@ -358,6 +368,23 @@ export default function StudentAddModal({ open, onClose, onSave }) {
           </div>
         </div>
       )}
+
+      {/* ── Muvaffaqiyat alert ── */}
+      <Snackbar
+        open={successAlert}
+        autoHideDuration={5000}
+        onClose={() => setSuccessAlert(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSuccessAlert(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%", fontFamily: "inherit", fontSize: "0.875rem" }}
+        >
+          Talaba muvaffaqiyatli ro'yxatdan o'tdi. Login va parol sms tarzida jo'natildi.
+        </Alert>
+      </Snackbar>
     </>
   );
 }

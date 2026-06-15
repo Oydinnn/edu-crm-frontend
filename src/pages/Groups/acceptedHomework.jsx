@@ -235,23 +235,24 @@ export default function AcceptedHomework() {
               const homeworkCreatedAt = studentDetail?.homework?.created_at || homework?.created_at;
               const grade = studentDetail?.homeworkResult?.grade;
 
-              // Calculate late penalty warning
+              // Calculate late penalty warning + effective grade after penalty
               let lateWarning = null;
+              let effectiveGrade = grade ?? null;
               if (homeworkCreatedAt && sentAt && grade) {
                 const deadlineTime = new Date(homeworkCreatedAt).getTime() + 20 * 60 * 60 * 1000;
                 const submittedTime = new Date(sentAt).getTime();
                 if (submittedTime > deadlineTime) {
                   const diffMs = submittedTime - deadlineTime;
                   const hoursLate = Math.ceil(diffMs / (1000 * 60 * 60));
-                  const originalGrade = Math.round(grade / 0.9);
-                  lateWarning = `${hoursLate} soatdan kechikib topshirilgani uchun qo'yilgan ${originalGrade} ball 10 % ga kamaytirildi.`;
+                  effectiveGrade = Math.round(grade * 0.9);
+                  lateWarning = `${hoursLate} soatdan kechikib topshirilgani uchun qo'yilgan ${grade} ball 10 % ga kamaytirildi.`;
                 }
               }
 
-              // Calculate gamification stats
-              const displayGrade = grade ?? "—";
-              const xp = grade ? (Math.floor(grade / 50) || 1) : "—";
-              const kumush = grade ? Math.ceil(grade / 10) : "—";
+              // Calculate gamification stats based on effective (penalized) grade
+              const displayGrade = effectiveGrade ?? "—";
+              const xp = effectiveGrade ? (Math.floor(effectiveGrade / 50) || 1) : "—";
+              const kumush = effectiveGrade ? Math.ceil(effectiveGrade / 10) : "—";
 
               return (
                 <div
@@ -286,7 +287,7 @@ export default function AcceptedHomework() {
                   {isExpanded ? (
                     <div className="mt-6 space-y-6 pt-6 border-t border-gray-100 transition-all duration-300">
                       {/* Metadata row */}
-                      <div className="grid grid-cols-3 gap-4 rounded-xl bg-gray-50/50 p-4 border border-gray-100/50">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 rounded-xl bg-gray-50/50 p-4 border border-gray-100/50">
                         <div>
                           <span className="block text-xs font-bold text-gray-400 mb-1 font-sans">Vaqti:</span>
                           <span className="text-sm font-bold text-gray-800 font-sans">
@@ -303,6 +304,13 @@ export default function AcceptedHomework() {
                           <span className="block text-xs font-bold text-gray-400 mb-1 font-sans">Status:</span>
                           <span className="inline-flex items-center rounded-md border border-emerald-200/50 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 font-sans">
                             Qabul qilindi
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-xs font-bold text-gray-400 mb-1 font-sans">Ball:</span>
+                          <span className="text-sm font-bold text-gray-900 flex items-center gap-1 font-sans">
+                            <span className="text-orange-500 text-base leading-none">⚡</span>
+                            {displayGrade}
                           </span>
                         </div>
                       </div>

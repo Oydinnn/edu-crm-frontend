@@ -42,13 +42,6 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString("ru-RU");
 }
 
-// function getPhotoUrl(photo) {
-//   if (!photo) return null;
-//   if (photo.startsWith("http")) return photo;
-//   return `${import.meta.env.VITE_API_URL?.replace("/api/v1", "")}${photo}`;
-// }
-
-
 
 function getPhotoUrl(photo) {
   if (!photo) return null;
@@ -92,27 +85,8 @@ export default function StudentsPage() {
   const [showStudent, setShowStudent] = useState(null);
   const [editStudent, setEditStudent] = useState(null);
   const [page, setPage] = useState(1);
-  const ROWS_PER_PAGE = 10;
+  const ROWS_PER_PAGE = 5;
  
-
-  // ── Yuklash ──
-  // const fetchStudents = useCallback(async (status = "active") => {
-  //   try {
-  //     const res = await api.get(`/students?status=${status}`);
-  //     setStudents(res.data.data || []);
-  //     // fetchStudents da qo'shing:
-  //   } catch (err) {
-  //     console.error("Xato:", err);
-  //   }
-  // }, []);
-
-  // // useEffect(() => { fetchStudents("active"); }, []);
-
-  // useEffect(() => {
-  //   if (aktifTab === "talabalar") fetchStudents("active");
-  //   else fetchStudents("inactive");
-  // }, [aktifTab]);
-
 
   // 1. Avval fetchStudents (useCallback)
 const fetchStudents = useCallback(async (status = "active") => {
@@ -290,8 +264,9 @@ useEffect(() => {
         </div>
 
         {/* ── Jadval ── */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-slate-800">
-          <div className="overflow-x-auto">
+        
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-100 dark:border-slate-800">
+          <div className="overflow-x-auto rounded-t-xl">
 
             {/* Header */}
             <div className="flex items-center px-4 py-3.5 bg-[#f0f4ff]/60 border-b border-gray-100 min-w-[950px]">
@@ -416,10 +391,7 @@ useEffect(() => {
                     <VisibilityIcon style={{ fontSize: 18 }} />
                   </button>
                   <button
-                  
-                    onClick={
-                      // console.log("EDIT STUDENT:", student.groups),
-                      () => setEditStudent(student)}
+                    onClick={() => setEditStudent(student)}
                     className="p-1.5 rounded-lg text-gray-400 hover:bg-[#f0f4ff] hover:text-[#1f39a1] transition-colors"
                   >
                     <EditIcon style={{ fontSize: 18 }} />
@@ -436,99 +408,92 @@ useEffect(() => {
             })}
           </div>
 
-
-          {/* ── Pagination ── */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-            
-            {/* Previous */}
+          {/* ── Pagination (Teacher style) ── */}
+          <div className="flex items-center justify-between px-6 py-5 border-t border-gray-100 dark:border-slate-800">
             <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-200 text-[#4a5568]
-                hover:bg-[#f0f4ff] hover:border-[#1f39a1] hover:text-[#1f39a1]
-                disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
-              ← Prev
+              ← Previous
             </button>
 
-            {/* Page raqamlari */}
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-all
-                    ${page === p
-                      ? "bg-[#1f39a1] text-white shadow-md"
-                      : "text-[#4a5568] hover:bg-[#f0f4ff] hover:text-[#1f39a1]"
-                    }`}
-                >
-                  {p}
-                </button>
-              ))}
+            <div className="flex items-center gap-2">
+              {(() => {
+                const pages = [];
+                for (let i = 1; i <= totalPages; i++) {
+                  if (
+                    i === 1 ||
+                    i === totalPages ||
+                    (i >= page - 1 && i <= page + 1)
+                  ) {
+                    pages.push(i);
+                  } else if (i === page - 2 || i === page + 2) {
+                    pages.push("...");
+                  }
+                }
+                return [...new Set(pages)].map((item, index) =>
+                  item === "..." ? (
+                    <span
+                      key={index}
+                      className="w-9 h-9 flex items-center justify-center text-gray-400"
+                    >
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={index}
+                      onClick={() => setPage(item)}
+                      className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
+                        page === item
+                          ? "bg-[#1f39a1] text-white shadow-md"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  ),
+                );
+              })()}
             </div>
 
-            {/* Next */}
             <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page >= totalPages}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-200 text-[#4a5568]
-                hover:bg-[#f0f4ff] hover:border-[#1f39a1] hover:text-[#1f39a1]
-                disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               Next →
             </button>
+            
           </div>
-        )}
-
-          
         </div>
+
+
+        {/* Modals */}
+        <Suspense fallback={null}>
+          {addOpen && (
+            <StudentAddModal
+              open={addOpen}
+              onClose={() => setAddOpen(false)}
+              onSave={handleSave}
+            />
+          )}
+          {showStudent && (
+            <StudentShowModal
+              student={showStudent}
+              onClose={() => setShowStudent(null)}
+              onEdit={(s) => { setShowStudent(null); setEditStudent(s); }}
+            />
+          )}
+          {editStudent && (
+            <StudentEditModal
+              student={editStudent}
+              onClose={() => setEditStudent(null)}
+              onSave={handleEditSave}
+            />
+          )}
+        </Suspense>
       </div>
-
-      {/* Modals */}
-      <Suspense fallback={null}>
-        {addOpen && (
-          <StudentAddModal
-            open={addOpen}
-            onClose={() => setAddOpen(false)}
-            onSave={handleSave}
-          />
-        )}
-        {showStudent && (
-          <StudentShowModal
-            student={showStudent}
-            onClose={() => setShowStudent(null)}
-            onEdit={(s) => { setShowStudent(null); setEditStudent(s); }}
-          />
-        )}
-        {editStudent && (
-          <StudentEditModal
-            student={editStudent}
-            onClose={() => setEditStudent(null)}
-            onSave={handleEditSave}
-          />
-        )}
-      </Suspense>
     </div>
-  );
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  )
+}   
